@@ -18,18 +18,25 @@ import com.clipreader.R
 class OverlayManager(
     private val context: Context,
     private val onPlayPause: () -> Unit,
+    private val onVoiceInput: () -> Unit,
     private val onStopService: () -> Unit
 ) {
     private var windowManager: WindowManager? = null
     private var windowContext: Context? = null
     private var floatingView: View? = null
+
     private var iconBackground: View? = null
     private var iconImage: ImageView? = null
-    
+    private var micBackground: View? = null
+    private var micImage: ImageView? = null
+
     private var params: WindowManager.LayoutParams? = null
 
     enum class State { IDLE, LOADING, PLAYING, ERROR }
     private var currentState = State.IDLE
+
+    enum class MicState { IDLE, LISTENING }
+    private var micState = MicState.IDLE
 
     fun show() {
         if (floatingView != null) return
@@ -51,6 +58,8 @@ class OverlayManager(
         floatingView = LayoutInflater.from(ctx).inflate(R.layout.overlay_bubble, null)
         iconBackground = floatingView?.findViewById(R.id.iconBackground)
         iconImage = floatingView?.findViewById(R.id.iconImage)
+        micBackground = floatingView?.findViewById(R.id.micBackground)
+        micImage = floatingView?.findViewById(R.id.micImage)
 
         params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -60,14 +69,17 @@ class OverlayManager(
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.BOTTOM or Gravity.END
-            x = 24   // margin from right edge (dp-ish)
-            y = 120  // margin from bottom edge (dp-ish)
+            x = 24
+            val cm3InPx = (3.0f / 2.54f * context.resources.displayMetrics.densityDpi).toInt()
+            y = 120 + cm3InPx
         }
 
         setupDragListener()
-        
+        setupMicButton()
+
         windowManager?.addView(floatingView, params)
         setState(State.IDLE)
+        setMicState(MicState.IDLE)
     }
 
     fun setState(state: State) {
@@ -98,6 +110,30 @@ class OverlayManager(
         }
     }
 
+    fun setMicState(state: MicState) {
+        micState = state
+        when (state) {
+            MicState.IDLE -> {
+                micBackground?.apply {
+                    setBackgroundResource(R.drawable.bg_floating_idle)
+                    alpha = 0.8f
+                }
+                micImage?.setImageResource(android.R.drawable.ic_btn_speak_now)
+            }
+            MicState.LISTENING -> {
+                micBackground?.setBackgroundColor(Color.parseColor("#E53935"))
+                micBackground?.alpha = 1.0f
+                micImage?.setImageResource(android.R.drawable.ic_btn_speak_now)
+            }
+        }
+    }
+
+    private fun setupMicButton() {
+        micBackground?.setOnClickListener {
+            onVoiceInput()
+        }
+    }
+
     private fun setupDragListener() {
         var initialX = 0
         var initialY = 0
@@ -118,11 +154,11 @@ class OverlayManager(
                 MotionEvent.ACTION_MOVE -> {
                     val dx = (event.rawX - initialTouchX).toInt()
                     val dy = (event.rawY - initialTouchY).toInt()
-                    
+
                     if (abs(dx) > 10 || abs(dy) > 10) {
                         isClick = false
                     }
-                    
+
                     params!!.x = initialX + dx
                     params!!.y = initialY + dy
                     windowManager?.updateViewLayout(floatingView, params)
@@ -133,7 +169,13 @@ class OverlayManager(
                     if (params!!.y > screenHeight - 300 && !isClick) {
                         onStopService()
                     } else if (isClick) {
-                        onPlayPause()
+                        // Determine which half was clicked — top = play, bottom = mic
+                        val viewHeight = floatingView?.height ?: 0
+                        val touchY = event.y
+                        if (touchY < viewHeight / 2) {
+                            onPlayPause()
+                        }
+                        // mic button handled by its own click listener
                     }
                     true
                 }

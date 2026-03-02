@@ -48,10 +48,8 @@ class ClipReaderService : Service() {
                 } else {
                     val service = com.clipreader.clipboard.AutoCopierService.instance
                     if (service != null) {
-                        // Accessibility service is active — let it find the 复制 button and auto-play
                         service.tryCopyAndPlay()
                     } else {
-                        // Fallback: just read whatever is on the clipboard right now
                         val actIntent = android.content.Intent(this, com.clipreader.clipboard.ClipboardReaderActivity::class.java).apply {
                             addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                             addFlags(android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION)
@@ -59,6 +57,9 @@ class ClipReaderService : Service() {
                         startActivity(actIntent)
                     }
                 }
+            },
+            onVoiceInput = {
+                com.clipreader.clipboard.AutoCopierService.instance?.tryVoiceInput(overlayManager)
             },
             onStopService = {
                 stopSelf()

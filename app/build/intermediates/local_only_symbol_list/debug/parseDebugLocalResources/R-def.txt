@@ -11,6 +11,8 @@ id btnTestPrimary
 id floatingRoot
 id iconBackground
 id iconImage
+id micBackground
+id micImage
 id spinnerFallbackEngine
 id spinnerPrimaryEngine
 layout activity_main

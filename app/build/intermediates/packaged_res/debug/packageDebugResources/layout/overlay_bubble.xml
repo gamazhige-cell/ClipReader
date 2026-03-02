@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Two-button vertical floating panel: Play (top) + Voice Input (bottom) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/floatingRoot"
-    android:layout_width="60dp"
-    android:layout_height="60dp">
+    android:layout_width="56dp"
+    android:layout_height="120dp"
+    android:orientation="vertical"
+    android:gravity="center">
 
+    <!-- Play / TTS button -->
     <androidx.cardview.widget.CardView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_gravity="center"
+        android:layout_marginBottom="4dp"
         app:cardCornerRadius="25dp"
         app:cardElevation="8dp"
         app:cardBackgroundColor="@android:color/transparent">
@@ -27,7 +31,31 @@
                 android:src="@android:drawable/ic_media_play"
                 app:tint="@android:color/white" />
         </FrameLayout>
-
     </androidx.cardview.widget.CardView>
 
-</FrameLayout>
+    <!-- Voice Input button -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="4dp"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@android:color/transparent">
+
+        <FrameLayout
+            android:id="@+id/micBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_floating_idle">
+
+            <ImageView
+                android:id="@+id/micImage"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_btn_speak_now"
+                app:tint="@android:color/white" />
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

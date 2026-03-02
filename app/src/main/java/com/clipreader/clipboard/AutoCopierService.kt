@@ -66,6 +66,158 @@ class AutoCopierService : AccessibilityService() {
         if (instance === this) instance = null
     }
 
+    // ---------- Voice Input Toggle ----------
+
+    private var isListening = false
+
+    /**
+     * Toggle voice input:
+     * - First tap: find & tap input field → wait → tap 豆包 "点击说话" button
+     * - Second tap: tap "结束说话" (end speech) button
+     */
+    fun tryVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
+        if (isListening) {
+            // End recording
+            stopVoiceInput(overlayManager)
+        } else {
+            // Start recording
+            startVoiceInput(overlayManager)
+        }
+    }
+
+    private fun startVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
+        val rootNode = rootInActiveWindow
+        if (rootNode == null) {
+            Log.w("AutoCopierService", "startVoiceInput: no root window")
+            return
+        }
+
+        // Step 1: Find and tap the input field (EditText)
+        val editNodes = mutableListOf<android.view.accessibility.AccessibilityNodeInfo>()
+        fun findEdits(node: android.view.accessibility.AccessibilityNodeInfo) {
+            if (node.className?.contains("EditText") == true) editNodes.add(node)
+            for (i in 0 until node.childCount) node.getChild(i)?.let { findEdits(it) }
+        }
+        findEdits(rootNode)
+
+        val inputNode = editNodes.firstOrNull()
+        if (inputNode == null) {
+            Log.w("AutoCopierService", "startVoiceInput: no EditText found")
+            return
+        }
+
+        val inputBounds = Rect()
+        inputNode.getBoundsInScreen(inputBounds)
+        val cx = inputBounds.centerX().toFloat()
+        val cy = inputBounds.centerY().toFloat()
+        Log.d("AutoCopierService", "Tapping input field at ($cx, $cy)")
+
+        val path = Path().apply { moveTo(cx, cy) }
+        val tapInputGesture = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(path, 0, 50))
+            .build()
+
+        dispatchGesture(tapInputGesture, object : GestureResultCallback() {
+            override fun onCompleted(g: GestureDescription?) {
+                // Step 2: After keyboard appears, tap the 点击说话 button
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    tapSpeakButton(overlayManager)
+                }, 600)
+            }
+            override fun onCancelled(g: GestureDescription?) {
+                Log.w("AutoCopierService", "Input field tap cancelled")
+            }
+        }, null)
+    }
+
+    private fun tapSpeakButton(overlayManager: com.clipreader.overlay.OverlayManager?) {
+        // Doubao IME keyboard might be in a separate window, scan all windows
+        val speakKeywords = listOf("点击说话", "按住说话", "说话", "Speak", "Voice input", "Start speech input")
+        val allWindows = windows ?: emptyList()
+
+        val allMatches = mutableListOf<Pair<android.view.accessibility.AccessibilityNodeInfo, Rect>>()
+        for (keyword in speakKeywords) {
+            for (window in allWindows) {
+                val root = window.root ?: continue
+                val nodes = root.findAccessibilityNodeInfosByText(keyword) +
+                            findNodesByContentDescription(root, keyword)
+                for (node in nodes) {
+                    val b = Rect()
+                    node.getBoundsInScreen(b)
+                    if (!b.isEmpty) allMatches.add(Pair(node, b))
+                }
+            }
+        }
+
+        val target = allMatches.firstOrNull()
+        if (target == null) {
+            Log.w("AutoCopierService", "tapSpeakButton: no speak button found in any window")
+            return
+        }
+
+        val tx = target.second.centerX().toFloat()
+        val ty = target.second.centerY().toFloat()
+        Log.d("AutoCopierService", "Tapping speak button at ($tx, $ty)")
+
+        val path = Path().apply { moveTo(tx, ty) }
+        val gesture = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(path, 0, 50))
+            .build()
+        dispatchGesture(gesture, object : GestureResultCallback() {
+            override fun onCompleted(g: GestureDescription?) {
+                isListening = true
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    overlayManager?.setMicState(com.clipreader.overlay.OverlayManager.MicState.LISTENING)
+                }
+                Log.d("AutoCopierService", "Voice input started. Mic = LISTENING")
+            }
+            override fun onCancelled(g: GestureDescription?) {
+                Log.w("AutoCopierService", "Speak button tap cancelled")
+            }
+        }, null)
+    }
+
+    private fun stopVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
+        // Find "结束说话" or equivalent stop button
+        val stopKeywords = listOf("结束说话", "停止说话", "Done", "Stop", "End speech", "完成")
+        val allWindows = windows ?: emptyList()
+        val allMatches = mutableListOf<Pair<android.view.accessibility.AccessibilityNodeInfo, Rect>>()
+
+        for (keyword in stopKeywords) {
+            for (window in allWindows) {
+                val root = window.root ?: continue
+                val nodes = root.findAccessibilityNodeInfosByText(keyword) +
+                            findNodesByContentDescription(root, keyword)
+                for (node in nodes) {
+                    val b = Rect()
+                    node.getBoundsInScreen(b)
+                    if (!b.isEmpty) allMatches.add(Pair(node, b))
+                }
+            }
+        }
+
+        val target = allMatches.firstOrNull()
+        if (target == null) {
+            // Fallback: tap the same speak button again to stop
+            Log.w("AutoCopierService", "No stop button found, tapping speak button again to stop")
+            tapSpeakButton(null)
+        } else {
+            val tx = target.second.centerX().toFloat()
+            val ty = target.second.centerY().toFloat()
+            val path = Path().apply { moveTo(tx, ty) }
+            val gesture = GestureDescription.Builder()
+                .addStroke(GestureDescription.StrokeDescription(path, 0, 50))
+                .build()
+            dispatchGesture(gesture, null, null)
+        }
+
+        isListening = false
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            overlayManager?.setMicState(com.clipreader.overlay.OverlayManager.MicState.IDLE)
+        }
+        Log.d("AutoCopierService", "Voice input stopped.")
+    }
+
     /**
      * Called by ClipReaderService when user taps the play button.
      * 
