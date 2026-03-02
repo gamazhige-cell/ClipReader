@@ -13,6 +13,15 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
+
+        // Read API key from local.properties — never committed to git
+        def localProps = new Properties()
+        def localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) {
+            localPropsFile.withInputStream { localProps.load(it) }
+        }
+        buildConfigField "String", "AZURE_API_KEY", "\"${localProps.getProperty('azure.api.key', '')}\""
+        buildConfigField "String", "AZURE_REGION", "\"eastasia\""
     }
 
     buildTypes {
@@ -30,6 +39,7 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 }
 
