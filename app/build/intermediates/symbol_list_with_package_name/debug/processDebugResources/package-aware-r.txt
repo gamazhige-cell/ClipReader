@@ -2968,8 +2968,12 @@ drawable abc_textfield_search_material
 drawable abc_vector_test
 drawable avd_hide_password
 drawable avd_show_password
+drawable bg_floating_back
 drawable bg_floating_idle
+drawable bg_floating_mic
+drawable bg_floating_play
 drawable bg_floating_playing
+drawable bg_floating_share
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
 drawable btn_checkbox_unchecked_mtrl
@@ -3165,6 +3169,8 @@ id auto
 id autoComplete
 id autoCompleteToEnd
 id autoCompleteToStart
+id backBackground
+id backImage
 id barrier
 id baseline
 id beginOnFirstDraw

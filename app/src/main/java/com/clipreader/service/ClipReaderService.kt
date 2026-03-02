@@ -93,6 +93,13 @@ class ClipReaderService : Service() {
                     shareToDoubao()
                 }
             },
+            onBack = {
+                val service = com.clipreader.clipboard.AutoCopierService.instance
+                if (service != null) {
+                    // This is an accessibility service global action
+                    service.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK)
+                }
+            },
             onStopService = {
                 stopSelf()
             }

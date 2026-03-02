@@ -21,6 +21,12 @@ public final class OverlayBubbleBinding implements ViewBinding {
   private final LinearLayout rootView;
 
   @NonNull
+  public final FrameLayout backBackground;
+
+  @NonNull
+  public final ImageView backImage;
+
+  @NonNull
   public final LinearLayout floatingRoot;
 
   @NonNull
@@ -41,11 +47,14 @@ public final class OverlayBubbleBinding implements ViewBinding {
   @NonNull
   public final ImageView shareImage;
 
-  private OverlayBubbleBinding(@NonNull LinearLayout rootView, @NonNull LinearLayout floatingRoot,
+  private OverlayBubbleBinding(@NonNull LinearLayout rootView, @NonNull FrameLayout backBackground,
+      @NonNull ImageView backImage, @NonNull LinearLayout floatingRoot,
       @NonNull FrameLayout iconBackground, @NonNull ImageView iconImage,
       @NonNull FrameLayout micBackground, @NonNull ImageView micImage,
       @NonNull FrameLayout shareBackground, @NonNull ImageView shareImage) {
     this.rootView = rootView;
+    this.backBackground = backBackground;
+    this.backImage = backImage;
     this.floatingRoot = floatingRoot;
     this.iconBackground = iconBackground;
     this.iconImage = iconImage;
@@ -82,6 +91,18 @@ public final class OverlayBubbleBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.backBackground;
+      FrameLayout backBackground = ViewBindings.findChildViewById(rootView, id);
+      if (backBackground == null) {
+        break missingId;
+      }
+
+      id = R.id.backImage;
+      ImageView backImage = ViewBindings.findChildViewById(rootView, id);
+      if (backImage == null) {
+        break missingId;
+      }
+
       LinearLayout floatingRoot = (LinearLayout) rootView;
 
       id = R.id.iconBackground;
@@ -120,8 +141,9 @@ public final class OverlayBubbleBinding implements ViewBinding {
         break missingId;
       }
 
-      return new OverlayBubbleBinding((LinearLayout) rootView, floatingRoot, iconBackground,
-          iconImage, micBackground, micImage, shareBackground, shareImage);
+      return new OverlayBubbleBinding((LinearLayout) rootView, backBackground, backImage,
+          floatingRoot, iconBackground, iconImage, micBackground, micImage, shareBackground,
+          shareImage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

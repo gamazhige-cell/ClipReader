@@ -20,6 +20,7 @@ class OverlayManager(
     private val onPlayPause: () -> Unit,
     private val onVoiceInput: () -> Unit,
     private val onShare: () -> Unit,
+    private val onBack: () -> Unit,
     private val onStopService: () -> Unit
 ) {
     private var windowManager: WindowManager? = null
@@ -32,6 +33,8 @@ class OverlayManager(
     private var micImage: ImageView? = null
     private var shareBackground: View? = null
     private var shareImage: ImageView? = null
+    private var backBackground: View? = null
+    private var backImage: ImageView? = null
 
     private var params: WindowManager.LayoutParams? = null
 
@@ -65,6 +68,8 @@ class OverlayManager(
         micImage = floatingView?.findViewById(R.id.micImage)
         shareBackground = floatingView?.findViewById(R.id.shareBackground)
         shareImage = floatingView?.findViewById(R.id.shareImage)
+        backBackground = floatingView?.findViewById(R.id.backBackground)
+        backImage = floatingView?.findViewById(R.id.backImage)
 
         params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -92,8 +97,8 @@ class OverlayManager(
         when (state) {
             State.IDLE -> {
                 iconBackground?.apply {
-                    setBackgroundResource(R.drawable.bg_floating_idle)
-                    alpha = 0.8f
+                    setBackgroundResource(R.drawable.bg_floating_play)
+                    alpha = 1.0f
                 }
                 iconImage?.setImageResource(android.R.drawable.ic_media_play)
             }
@@ -120,8 +125,8 @@ class OverlayManager(
         when (state) {
             MicState.IDLE -> {
                 micBackground?.apply {
-                    setBackgroundResource(R.drawable.bg_floating_idle)
-                    alpha = 0.8f
+                    setBackgroundResource(R.drawable.bg_floating_mic)
+                    alpha = 1.0f
                 }
                 micImage?.setImageResource(android.R.drawable.ic_btn_speak_now)
             }
@@ -139,6 +144,9 @@ class OverlayManager(
         }
         shareBackground?.setOnClickListener {
             onShare()
+        }
+        backBackground?.setOnClickListener {
+            onBack()
         }
     }
 
@@ -179,13 +187,14 @@ class OverlayManager(
                     } else if (params!!.y >= screenHeight - 300 && !isClick) {
                         onStopService()
                     } else if (isClick) {
-                        // Split by Y: 3 segments: top = play, middle = share, bottom = mic
-                        val viewHeight = floatingView?.height ?: 3
+                        // Split by Y: 4 segments: play, share, mic, back
+                        val viewHeight = floatingView?.height ?: 4
                         val touchY = event.y
                         when {
-                            touchY < viewHeight / 3f -> onPlayPause()
-                            touchY < 2 * viewHeight / 3f -> onShare()
-                            else -> onVoiceInput()
+                            touchY < viewHeight * 0.25f -> onPlayPause()
+                            touchY < viewHeight * 0.5f -> onShare()
+                            touchY < viewHeight * 0.75f -> onVoiceInput()
+                            else -> onBack()
                         }
                     }
                     true

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/floatingRoot"
     android:layout_width="56dp"
-    android:layout_height="180dp"
+    android:layout_height="240dp"
     android:orientation="vertical"
     android:gravity="center">
 
@@ -21,7 +21,7 @@
             android:id="@+id/iconBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_floating_idle">
+            android:background="@drawable/bg_floating_play">
 
             <ImageView
                 android:id="@+id/iconImage"
@@ -47,7 +47,7 @@
             android:id="@+id/shareBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_floating_idle">
+            android:background="@drawable/bg_floating_share">
 
             <ImageView
                 android:id="@+id/shareImage"
@@ -64,6 +64,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         app:cardCornerRadius="25dp"
         app:cardElevation="8dp"
         app:cardBackgroundColor="@android:color/transparent">
@@ -72,7 +73,7 @@
             android:id="@+id/micBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_floating_idle">
+            android:background="@drawable/bg_floating_mic">
 
             <ImageView
                 android:id="@+id/micImage"
@@ -80,6 +81,31 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@android:drawable/ic_btn_speak_now"
+                app:tint="@android:color/white" />
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Back Button -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="4dp"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@android:color/transparent">
+
+        <FrameLayout
+            android:id="@+id/backBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_floating_back">
+
+            <ImageView
+                android:id="@+id/backImage"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_revert"
                 app:tint="@android:color/white" />
         </FrameLayout>
     </androidx.cardview.widget.CardView>
