@@ -10,6 +10,8 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.os.Handler
+import android.os.Looper
 import kotlin.math.abs
 
 import android.view.LayoutInflater
@@ -40,6 +42,11 @@ class OverlayManager(
 
     enum class State { IDLE, LOADING, PLAYING, ERROR }
     private var currentState = State.IDLE
+
+    private val hideHandler = Handler(Looper.getMainLooper())
+    private val hideRunnable = Runnable {
+        floatingView?.animate()?.alpha(0.3f)?.setDuration(300)?.start()
+    }
 
     enum class MicState { IDLE, LISTENING }
     private var micState = MicState.IDLE
@@ -78,10 +85,9 @@ class OverlayManager(
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         ).apply {
-            gravity = Gravity.BOTTOM or Gravity.END
+            gravity = Gravity.TOP or Gravity.END
             x = 24
-            val cm3InPx = (3.0f / 2.54f * context.resources.displayMetrics.densityDpi).toInt()
-            y = 120 + cm3InPx
+            y = 300 // Starting from top down to avoid the keyboard area.
         }
 
         setupDragListener()
@@ -90,50 +96,89 @@ class OverlayManager(
         windowManager?.addView(floatingView, params)
         setState(State.IDLE)
         setMicState(MicState.IDLE)
+        
+        // Start auto-hide timer
+        resetHideTimer()
+    }
+
+    private fun resetHideTimer() {
+        hideHandler.removeCallbacks(hideRunnable)
+        floatingView?.alpha = 1.0f
+        hideHandler.postDelayed(hideRunnable, 3000)
     }
 
     fun setState(state: State) {
         currentState = state
+        
+        // Manage auto-hide based on activity
+        floatingView?.alpha = 1.0f
+        if (state != State.IDLE) {
+            hideHandler.removeCallbacks(hideRunnable)
+        } else if (micState == MicState.IDLE) {
+            resetHideTimer()
+        }
+
         when (state) {
             State.IDLE -> {
                 iconBackground?.apply {
-                    setBackgroundResource(R.drawable.bg_floating_play)
+                    setBackgroundResource(R.drawable.bg_floating_minimal)
                     alpha = 1.0f
                 }
                 iconImage?.setImageResource(android.R.drawable.ic_media_play)
+                iconImage?.setColorFilter(Color.parseColor("#34C759")) // Green
             }
             State.LOADING -> {
-                iconBackground?.setBackgroundColor(Color.parseColor("#FFA500"))
-                iconBackground?.alpha = 0.9f
+                iconBackground?.apply {
+                    setBackgroundResource(R.drawable.bg_floating_minimal)
+                    alpha = 1.0f
+                }
+                iconImage?.setColorFilter(Color.parseColor("#FFCC00")) // Yellow
             }
             State.PLAYING -> {
                 iconBackground?.apply {
-                    setBackgroundResource(R.drawable.bg_floating_playing)
+                    setBackgroundResource(R.drawable.bg_floating_minimal)
                     alpha = 1.0f
                 }
                 iconImage?.setImageResource(android.R.drawable.ic_media_pause)
+                iconImage?.setColorFilter(Color.parseColor("#34C759")) // Green
             }
             State.ERROR -> {
-                iconBackground?.setBackgroundColor(Color.parseColor("#FF0000"))
-                iconBackground?.alpha = 1.0f
+                iconBackground?.apply {
+                    setBackgroundResource(R.drawable.bg_floating_minimal)
+                    alpha = 1.0f
+                }
+                iconImage?.setColorFilter(Color.parseColor("#FF3B30")) // Red
             }
         }
     }
 
     fun setMicState(state: MicState) {
         micState = state
+        
+        // Manage auto-hide based on activity
+        floatingView?.alpha = 1.0f
+        if (state != MicState.IDLE) {
+            hideHandler.removeCallbacks(hideRunnable)
+        } else if (currentState == State.IDLE) {
+            resetHideTimer()
+        }
+
         when (state) {
             MicState.IDLE -> {
                 micBackground?.apply {
-                    setBackgroundResource(R.drawable.bg_floating_mic)
+                    setBackgroundResource(R.drawable.bg_floating_minimal)
                     alpha = 1.0f
                 }
                 micImage?.setImageResource(android.R.drawable.ic_btn_speak_now)
+                micImage?.setColorFilter(Color.parseColor("#FF9500")) // Orange
             }
             MicState.LISTENING -> {
-                micBackground?.setBackgroundColor(Color.parseColor("#E53935"))
-                micBackground?.alpha = 1.0f
+                micBackground?.apply {
+                    setBackgroundResource(R.drawable.bg_floating_minimal)
+                    alpha = 1.0f
+                }
                 micImage?.setImageResource(android.R.drawable.ic_btn_speak_now)
+                micImage?.setColorFilter(Color.parseColor("#FF3B30")) // Red indicating recording
             }
         }
     }
@@ -160,6 +205,9 @@ class OverlayManager(
         floatingView?.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    hideHandler.removeCallbacks(hideRunnable)
+                    floatingView?.alpha = 1.0f
+                    
                     initialX = params!!.x
                     initialY = params!!.y
                     initialTouchX = event.rawX
@@ -197,6 +245,10 @@ class OverlayManager(
                             else -> onBack()
                         }
                     }
+                    
+                    if (currentState == State.IDLE && micState == MicState.IDLE) {
+                        resetHideTimer()
+                    }
                     true
                 }
                 else -> false
@@ -205,6 +257,7 @@ class OverlayManager(
     }
 
     fun remove() {
+        hideHandler.removeCallbacksAndMessages(null)
         floatingView?.let {
             try {
                 windowManager?.removeView(it)

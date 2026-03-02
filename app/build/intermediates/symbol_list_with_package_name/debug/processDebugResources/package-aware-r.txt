@@ -2971,6 +2971,7 @@ drawable avd_show_password
 drawable bg_floating_back
 drawable bg_floating_idle
 drawable bg_floating_mic
+drawable bg_floating_minimal
 drawable bg_floating_play
 drawable bg_floating_playing
 drawable bg_floating_share
