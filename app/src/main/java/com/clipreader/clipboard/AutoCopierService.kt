@@ -236,7 +236,7 @@ class AutoCopierService : AccessibilityService() {
         val rootNode = rootInActiveWindow
         if (rootNode == null) {
             Log.w("AutoCopierService", "No root window, triggering share directly.")
-            triggerShareBroadcast()
+            launchClipboardReader("SHARE")
             return
         }
 
@@ -246,7 +246,7 @@ class AutoCopierService : AccessibilityService() {
         val found = tapButtonByDescAndThenAction(rootNode, listOf("复制", "Copy", "拷贝", "Copy to clipboard"), "SHARE")
         if (!found) {
             Log.d("AutoCopierService", "No 复制 button found, triggering share directly.")
-            triggerShareBroadcast()
+            launchClipboardReader("SHARE")
         }
     }
 
@@ -257,7 +257,7 @@ class AutoCopierService : AccessibilityService() {
         val rootNode = rootInActiveWindow
         if (rootNode == null) {
             Log.w("AutoCopierService", "No root window, launching ClipboardReader directly.")
-            launchClipboardReader()
+            launchClipboardReader("PLAY")
             return
         }
 
@@ -273,7 +273,7 @@ class AutoCopierService : AccessibilityService() {
             val found = tapButtonByDescAndThenAction(rootNode, listOf("复制", "Copy", "拷贝", "Copy to clipboard"), "READ")
             if (!found) {
                 Log.d("AutoCopierService", "No 复制 button found, reading clipboard directly.")
-                launchClipboardReader()
+                launchClipboardReader("PLAY")
             }
         }
     }
@@ -340,8 +340,8 @@ class AutoCopierService : AccessibilityService() {
             override fun onCompleted(g: GestureDescription?) {
                 android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                     when (action) {
-                        "READ" -> launchClipboardReader()
-                        "SHARE" -> triggerShareBroadcast()
+                        "READ" -> launchClipboardReader("PLAY")
+                        "SHARE" -> launchClipboardReader("SHARE")
                     }
                 }, 700)
             }
@@ -353,22 +353,17 @@ class AutoCopierService : AccessibilityService() {
         return true
     }
 
-    private fun launchClipboardReader() {
+    private fun launchClipboardReader(actionType: String = "PLAY") {
         try {
             val intent = Intent(this, ClipboardReaderActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                putExtra("ACTION_TYPE", actionType)
             }
             startActivity(intent)
         } catch (e: Exception) {
             Log.e("AutoCopierService", "Error launching ClipboardReaderActivity: ${e.message}")
         }
-    }
-
-    private fun triggerShareBroadcast() {
-        val intent = Intent("com.clipreader.ACTION_SHARE_TO_DOUBAO")
-        // We trigger it for ClipReaderService to handle
-        sendBroadcast(intent)
     }
 
     private fun findNodesByContentDescription(root: AccessibilityNodeInfo, text: String): List<AccessibilityNodeInfo> {

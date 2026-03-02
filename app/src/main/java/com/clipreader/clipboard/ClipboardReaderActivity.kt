@@ -12,10 +12,12 @@ import com.clipreader.service.ClipReaderService
 
 class ClipboardReaderActivity : Activity() {
     private var hasRead = false
+    private var actionType = "PLAY"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("ClipboardReader", "Starting transparent activity for clipboard")
+        actionType = intent.getStringExtra("ACTION_TYPE") ?: "PLAY"
+        Log.d("ClipboardReader", "Starting transparent activity for clipboard ($actionType)")
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -44,12 +46,21 @@ class ClipboardReaderActivity : Activity() {
                     val contentToPlay = if (cleaned.length > 2000) cleaned.substring(0, 2000) else cleaned
                     Log.d("ClipboardReader", "Read text (cleaned): $contentToPlay")
                     
-                    // Send intent to service to play the text
-                    val playIntent = Intent(this, ClipReaderService::class.java).apply {
-                        action = "ACTION_PLAY_TEXT"
-                        putExtra("TEXT_TO_PLAY", contentToPlay)
+                    if (actionType == "SHARE") {
+                        // Send intent to service to share the text
+                        val shareIntent = Intent(this, ClipReaderService::class.java).apply {
+                            action = "ACTION_SHARE_TEXT"
+                            putExtra("TEXT_TO_SHARE", text) // Use original text for sharing, prompt added in service
+                        }
+                        startService(shareIntent)
+                    } else {
+                        // Send intent to service to play the text
+                        val playIntent = Intent(this, ClipReaderService::class.java).apply {
+                            action = "ACTION_PLAY_TEXT"
+                            putExtra("TEXT_TO_PLAY", contentToPlay)
+                        }
+                        startService(playIntent)
                     }
-                    startService(playIntent)
                     
                     // Clear the clipboard explicitly to prevent accidental replays
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {

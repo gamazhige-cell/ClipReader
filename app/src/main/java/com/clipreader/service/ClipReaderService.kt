@@ -152,6 +152,11 @@ class ClipReaderService : Service() {
             if (!textToPlay.isNullOrEmpty()) {
                 ttsManager?.play(textToPlay)
             }
+        } else if (intent?.action == "ACTION_SHARE_TEXT") {
+            val textToShare = intent.getStringExtra("TEXT_TO_SHARE")
+            if (!textToShare.isNullOrEmpty()) {
+                shareToDoubao(textToShare)
+            }
         }
         return START_STICKY
     }
@@ -191,12 +196,16 @@ class ClipReaderService : Service() {
             .build()
     }
 
-    private fun shareToDoubao() {
-        val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        val clipData = clipboard.primaryClip
-        val text = if (clipData != null && clipData.itemCount > 0) {
-            clipData.getItemAt(0).text?.toString() ?: ""
-        } else ""
+    private fun shareToDoubao(providedText: String? = null) {
+        val text = if (providedText != null) {
+            providedText
+        } else {
+            val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clipData = clipboard.primaryClip
+            if (clipData != null && clipData.itemCount > 0) {
+                clipData.getItemAt(0).text?.toString() ?: ""
+            } else ""
+        }
 
         if (text.isEmpty()) {
             Toast.makeText(this, "剪贴板为空", Toast.LENGTH_SHORT).show()

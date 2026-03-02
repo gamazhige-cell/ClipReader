@@ -13,6 +13,8 @@ id iconBackground
 id iconImage
 id micBackground
 id micImage
+id shareBackground
+id shareImage
 id spinnerFallbackEngine
 id spinnerPrimaryEngine
 layout activity_main

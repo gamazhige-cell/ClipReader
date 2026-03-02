@@ -35,15 +35,24 @@ public final class OverlayBubbleBinding implements ViewBinding {
   @NonNull
   public final ImageView micImage;
 
+  @NonNull
+  public final FrameLayout shareBackground;
+
+  @NonNull
+  public final ImageView shareImage;
+
   private OverlayBubbleBinding(@NonNull LinearLayout rootView, @NonNull LinearLayout floatingRoot,
       @NonNull FrameLayout iconBackground, @NonNull ImageView iconImage,
-      @NonNull FrameLayout micBackground, @NonNull ImageView micImage) {
+      @NonNull FrameLayout micBackground, @NonNull ImageView micImage,
+      @NonNull FrameLayout shareBackground, @NonNull ImageView shareImage) {
     this.rootView = rootView;
     this.floatingRoot = floatingRoot;
     this.iconBackground = iconBackground;
     this.iconImage = iconImage;
     this.micBackground = micBackground;
     this.micImage = micImage;
+    this.shareBackground = shareBackground;
+    this.shareImage = shareImage;
   }
 
   @Override
@@ -99,8 +108,20 @@ public final class OverlayBubbleBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.shareBackground;
+      FrameLayout shareBackground = ViewBindings.findChildViewById(rootView, id);
+      if (shareBackground == null) {
+        break missingId;
+      }
+
+      id = R.id.shareImage;
+      ImageView shareImage = ViewBindings.findChildViewById(rootView, id);
+      if (shareImage == null) {
+        break missingId;
+      }
+
       return new OverlayBubbleBinding((LinearLayout) rootView, floatingRoot, iconBackground,
-          iconImage, micBackground, micImage);
+          iconImage, micBackground, micImage, shareBackground, shareImage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

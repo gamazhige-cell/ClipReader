@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:2:1-57:12
-INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:2:1-57:12
-INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:2:1-57:12
-INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:2:1-57:12
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:2:1-64:12
+INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:2:1-64:12
+INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:2:1-64:12
+INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:2:1-64:12
 MERGED from [androidx.databinding:viewbinding:9.0.1] /Users/william/.gradle/caches/9.1.0/transforms/22e37171e026539a0362c45ff652f915/transformed/viewbinding-9.0.1/AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.11.0] /Users/william/.gradle/caches/9.1.0/transforms/b7405b630cd41720a7a130168e7e0c14/transformed/material-1.11.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/william/.gradle/caches/9.1.0/transforms/40a568a635bb86b30f30400572456827/transformed/constraintlayout-2.1.4/AndroidManifest.xml:2:1-11:12
@@ -77,9 +77,23 @@ uses-permission#android.permission.POST_NOTIFICATIONS
 ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:9:5-77
 	android:name
 		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:9:22-74
+queries
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:11:5-15:15
+package#com.doubao.app
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:12:9-50
+	android:name
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:12:18-47
+package#com.bytedance.android.doubaoime
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:13:9-67
+	android:name
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:13:18-64
+package#com.larus.nova
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:14:9-50
+	android:name
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:14:18-47
 application
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:10:5-55:19
-INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:10:5-55:19
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:17:5-62:19
+INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:17:5-62:19
 MERGED from [com.google.android.material:material:1.11.0] /Users/william/.gradle/caches/9.1.0/transforms/b7405b630cd41720a7a130168e7e0c14/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] /Users/william/.gradle/caches/9.1.0/transforms/b7405b630cd41720a7a130168e7e0c14/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/william/.gradle/caches/9.1.0/transforms/40a568a635bb86b30f30400572456827/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
@@ -101,85 +115,85 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/william/.gradle/cach
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] /Users/william/.gradle/caches/9.1.0/transforms/961f5dfadab63a1bc92e9ed303c781fb/transformed/core-1.12.0/AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:15:9-35
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:22:9-35
 	android:label
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:14:9-41
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:21:9-41
 	android:roundIcon
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:13:9-54
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:20:9-54
 	android:icon
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:12:9-43
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:19:9-43
 	android:allowBackup
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:11:9-35
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:18:9-35
 	android:theme
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:16:9-67
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:23:9-67
 activity#com.clipreader.MainActivity
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:17:9-24:20
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:24:9-31:20
 	android:exported
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:19:13-36
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:26:13-36
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:18:13-41
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:25:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:20:13-23:29
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:27:13-30:29
 action#android.intent.action.MAIN
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:21:17-69
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:28:17-69
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:21:25-66
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:28:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:22:17-77
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:29:17-77
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:22:27-74
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:29:27-74
 service#com.clipreader.service.ClipReaderService
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:27:9-33:19
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:34:9-40:19
 	android:enabled
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:29:13-35
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:36:13-35
 	android:exported
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:30:13-36
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:37:13-36
 	android:foregroundServiceType
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:31:13-55
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:38:13-55
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:28:13-54
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:35:13-54
 property#android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:32:13-150
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:39:13-150
 	android:value
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:32:83-147
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:39:83-147
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:32:23-82
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:39:23-82
 activity#com.clipreader.clipboard.ClipboardReaderActivity
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:35:9-41:40
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:42:9-48:40
 	android:excludeFromRecents
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:38:13-46
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:45:13-46
 	android:launchMode
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:40:13-48
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:47:13-48
 	android:exported
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:41:13-37
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:48:13-37
 	android:theme
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:37:13-72
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:44:13-72
 	android:taskAffinity
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:39:13-36
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:46:13-36
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:36:13-62
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:43:13-62
 service#com.clipreader.clipboard.AutoCopierService
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:43:9-54:19
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:50:9-61:19
 	android:label
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:45:13-47
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:52:13-47
 	android:exported
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:47:13-36
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:54:13-36
 	android:permission
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:46:13-79
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:53:13-79
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:44:13-56
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:51:13-56
 intent-filter#action:name:android.accessibilityservice.AccessibilityService
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:48:13-50:29
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:55:13-57:29
 action#android.accessibilityservice.AccessibilityService
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:49:17-92
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:56:17-92
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:49:25-89
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:56:25-89
 meta-data#android.accessibilityservice
-ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:51:13-53:72
+ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:58:13-60:72
 	android:resource
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:53:17-69
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:60:17-69
 	android:name
-		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:52:17-60
+		ADDED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:59:17-60
 uses-sdk
 INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml
