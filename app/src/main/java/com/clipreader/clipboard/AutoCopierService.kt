@@ -131,33 +131,12 @@ class AutoCopierService : AccessibilityService() {
     }
 
     private fun tapSpeakButton(overlayManager: com.clipreader.overlay.OverlayManager?) {
-        // Doubao IME keyboard might be in a separate window, scan all windows
-        val speakKeywords = listOf("点击说话", "按住说话", "说话", "Speak", "Voice input", "Start speech input")
-        val allWindows = windows ?: emptyList()
-
-        val allMatches = mutableListOf<Pair<android.view.accessibility.AccessibilityNodeInfo, Rect>>()
-        for (keyword in speakKeywords) {
-            for (window in allWindows) {
-                val root = window.root ?: continue
-                val nodes = root.findAccessibilityNodeInfosByText(keyword) +
-                            findNodesByContentDescription(root, keyword)
-                for (node in nodes) {
-                    val b = Rect()
-                    node.getBoundsInScreen(b)
-                    if (!b.isEmpty) allMatches.add(Pair(node, b))
-                }
-            }
-        }
-
-        val target = allMatches.firstOrNull()
-        if (target == null) {
-            Log.w("AutoCopierService", "tapSpeakButton: no speak button found in any window")
-            return
-        }
-
-        val tx = target.second.centerX().toFloat()
-        val ty = target.second.centerY().toFloat()
-        Log.d("AutoCopierService", "Tapping speak button at ($tx, $ty)")
+        // Doubao IME "点击说话" button is at a fixed position in the keyboard toolbar.
+        // On 1080x2424 screen: approximately x=270, y=1680 (25% left, 69% down).
+        val dm = resources.displayMetrics
+        val tx = dm.widthPixels * 0.25f
+        val ty = dm.heightPixels * 0.695f
+        Log.d("AutoCopierService", "Tapping Doubao speak button at fixed coords ($tx, $ty)")
 
         val path = Path().apply { moveTo(tx, ty) }
         val gesture = GestureDescription.Builder()
@@ -169,7 +148,7 @@ class AutoCopierService : AccessibilityService() {
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                     overlayManager?.setMicState(com.clipreader.overlay.OverlayManager.MicState.LISTENING)
                 }
-                Log.d("AutoCopierService", "Voice input started. Mic = LISTENING")
+                Log.d("AutoCopierService", "Voice input started via fixed coordinate.")
             }
             override fun onCancelled(g: GestureDescription?) {
                 Log.w("AutoCopierService", "Speak button tap cancelled")
@@ -178,44 +157,124 @@ class AutoCopierService : AccessibilityService() {
     }
 
     private fun stopVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
-        // Find "结束说话" or equivalent stop button
-        val stopKeywords = listOf("结束说话", "停止说话", "Done", "Stop", "End speech", "完成")
-        val allWindows = windows ?: emptyList()
-        val allMatches = mutableListOf<Pair<android.view.accessibility.AccessibilityNodeInfo, Rect>>()
+        // Tap the same coordinate — when recording, "点击说话" becomes "结束" in the same position
+        val dm = resources.displayMetrics
+        val tx = dm.widthPixels * 0.25f
+        val ty = dm.heightPixels * 0.695f
+        Log.d("AutoCopierService", "Tapping stop recording at fixed coords ($tx, $ty)")
 
-        for (keyword in stopKeywords) {
-            for (window in allWindows) {
-                val root = window.root ?: continue
-                val nodes = root.findAccessibilityNodeInfosByText(keyword) +
-                            findNodesByContentDescription(root, keyword)
-                for (node in nodes) {
-                    val b = Rect()
-                    node.getBoundsInScreen(b)
-                    if (!b.isEmpty) allMatches.add(Pair(node, b))
-                }
+        val path = Path().apply { moveTo(tx, ty) }
+        val gesture = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(path, 0, 50))
+            .build()
+        dispatchGesture(gesture, object : GestureResultCallback() {
+            override fun onCompleted(g: GestureDescription?) {
+                // Wait for speech-to-text to transcribe, then tap Send button
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    tapSendButton()
+                }, 1500)
             }
-        }
-
-        val target = allMatches.firstOrNull()
-        if (target == null) {
-            // Fallback: tap the same speak button again to stop
-            Log.w("AutoCopierService", "No stop button found, tapping speak button again to stop")
-            tapSpeakButton(null)
-        } else {
-            val tx = target.second.centerX().toFloat()
-            val ty = target.second.centerY().toFloat()
-            val path = Path().apply { moveTo(tx, ty) }
-            val gesture = GestureDescription.Builder()
-                .addStroke(GestureDescription.StrokeDescription(path, 0, 50))
-                .build()
-            dispatchGesture(gesture, null, null)
-        }
+        }, null)
 
         isListening = false
         android.os.Handler(android.os.Looper.getMainLooper()).post {
             overlayManager?.setMicState(com.clipreader.overlay.OverlayManager.MicState.IDLE)
         }
-        Log.d("AutoCopierService", "Voice input stopped.")
+        Log.d("AutoCopierService", "Voice input stopped, will auto-send in 1.5s.")
+    }
+
+    private fun tapSendButton() {
+        Log.d("AutoCopierService", "Attempting robust send button discovery...")
+        val root = rootInActiveWindow ?: return
+        
+        // 1. Keyword-based discovery with Parent-Traversal
+        val sendKeywords = listOf("发送", "Send", "提交", "Submit", "Add to chat") // Claude's icon-desc is sometimes Send or Add to chat
+        for (keyword in sendKeywords) {
+            val nodes = root.findAccessibilityNodeInfosByText(keyword) +
+                        findNodesByContentDescription(root, keyword)
+            for (node in nodes) {
+                // Find nearest clickable parent or the node itself
+                var candidate: android.view.accessibility.AccessibilityNodeInfo? = node
+                while (candidate != null) {
+                    if (candidate.isClickable && candidate.isEnabled) {
+                        val b = Rect()
+                        candidate.getBoundsInScreen(b)
+                        if (!b.isEmpty) {
+                            val sx = b.centerX().toFloat()
+                            val sy = b.centerY().toFloat()
+                            Log.d("AutoCopierService", "Tapping send (node-traversal: $keyword) at ($sx, $sy)")
+                            val p = Path().apply { moveTo(sx, sy) }
+                            val g = GestureDescription.Builder()
+                                .addStroke(GestureDescription.StrokeDescription(p, 0, 50))
+                                .build()
+                            dispatchGesture(g, null, null)
+                            return
+                        }
+                    }
+                    candidate = candidate.parent
+                }
+            }
+        }
+
+        // 2. Relative position discovery (Right of EditText)
+        val editNodes = mutableListOf<android.view.accessibility.AccessibilityNodeInfo>()
+        fun findEdits(node: android.view.accessibility.AccessibilityNodeInfo) {
+            if (node.className?.contains("EditText") == true) editNodes.add(node)
+            for (i in 0 until node.childCount) node.getChild(i)?.let { findEdits(it) }
+        }
+        findEdits(root)
+
+        val inputNode = editNodes.firstOrNull()
+        if (inputNode != null) {
+            val b = Rect()
+            inputNode.getBoundsInScreen(b)
+            if (!b.isEmpty) {
+                // Look for siblings to the right of EditText
+                val parent = inputNode.parent
+                if (parent != null) {
+                    for (i in 0 until parent.childCount) {
+                        val sibling = parent.getChild(i) ?: continue
+                        if (sibling != inputNode) {
+                            val sb = Rect()
+                            sibling.getBoundsInScreen(sb)
+                            if (sb.left >= b.right - 50 && sb.centerY() in (b.top - 100)..(b.bottom + 100) && (sibling.isClickable || sibling.childCount > 0)) {
+                                val sx = sb.centerX().toFloat()
+                                val sy = sb.centerY().toFloat()
+                                Log.d("AutoCopierService", "Tapping send (right-sibling) at ($sx, $sy)")
+                                val p = Path().apply { moveTo(sx, sy) }
+                                val g = GestureDescription.Builder()
+                                    .addStroke(GestureDescription.StrokeDescription(p, 0, 50))
+                                    .build()
+                                dispatchGesture(g, null, null)
+                                return
+                            }
+                        }
+                    }
+                }
+                
+                // Pure coordinate offset from EditText
+                val sx = (b.right + 80).toFloat().coerceAtMost(resources.displayMetrics.widthPixels * 0.98f)
+                val sy = b.centerY().toFloat()
+                Log.d("AutoCopierService", "Tapping send (EditText-offset) at ($sx, $sy)")
+                val p = Path().apply { moveTo(sx, sy) }
+                val g = GestureDescription.Builder()
+                    .addStroke(GestureDescription.StrokeDescription(p, 0, 50))
+                    .build()
+                dispatchGesture(g, null, null)
+                return
+            }
+        }
+
+        // 3. Absolute Fallback
+        val dm = resources.displayMetrics
+        val sx = dm.widthPixels * 0.92f
+        val sy = dm.heightPixels * 0.63f
+        Log.d("AutoCopierService", "Tapping send (absolute-fallback) at ($sx, $sy)")
+        val p = Path().apply { moveTo(sx, sy) }
+        val g = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(p, 0, 50))
+            .build()
+        dispatchGesture(g, null, null)
     }
 
     /**

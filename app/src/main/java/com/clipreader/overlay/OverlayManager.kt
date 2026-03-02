@@ -166,16 +166,19 @@ class OverlayManager(
                 }
                 MotionEvent.ACTION_UP -> {
                     val screenHeight = context.resources.displayMetrics.heightPixels
-                    if (params!!.y > screenHeight - 300 && !isClick) {
+                    if (params!!.y < screenHeight - 300 && !isClick) {
+                        // Dragged far down but not a click — nothing
+                    } else if (params!!.y >= screenHeight - 300 && !isClick) {
                         onStopService()
                     } else if (isClick) {
-                        // Determine which half was clicked — top = play, bottom = mic
-                        val viewHeight = floatingView?.height ?: 0
+                        // Split by Y: top half = play, bottom half = mic
+                        val viewHeight = floatingView?.height ?: 2
                         val touchY = event.y
-                        if (touchY < viewHeight / 2) {
+                        if (touchY < viewHeight / 2f) {
                             onPlayPause()
+                        } else {
+                            onVoiceInput()
                         }
-                        // mic button handled by its own click listener
                     }
                     true
                 }
