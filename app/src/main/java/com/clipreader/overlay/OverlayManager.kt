@@ -59,9 +59,9 @@ class OverlayManager(
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         ).apply {
-            gravity = Gravity.TOP or Gravity.START
-            x = 0
-            y = 300 // move further down
+            gravity = Gravity.BOTTOM or Gravity.END
+            x = 24   // margin from right edge (dp-ish)
+            y = 120  // margin from bottom edge (dp-ish)
         }
 
         setupDragListener()
