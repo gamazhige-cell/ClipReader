@@ -77,62 +77,111 @@ class AutoCopierService : AccessibilityService() {
      * - Second tap: tap "结束说话" (end speech) button
      */
     fun tryVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
-        tryVoiceInput() // Call the new overloaded function
+        if (isListening) {
+            // End recording
+            stopVoiceInput(overlayManager)
+        } else {
+            // Start recording
+            startVoiceInput(overlayManager)
+        }
     }
 
-    private fun tryVoiceInput() {
-        Log.d("AutoCopierService", "Attempting Doubao Voice Input via Intent")
-        val packageName = getDoubaoPackage()
-        if (packageName == null) {
-            Log.e("AutoCopierService", "Doubao App not found (checked com.doubao.app and com.larus.nova)")
-            Toast.makeText(this, "未找到豆包App，请安装后重试", Toast.LENGTH_SHORT).show()
+    private fun startVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
+        val rootNode = rootInActiveWindow
+        if (rootNode == null) {
+            Log.w("AutoCopierService", "startVoiceInput: no root window")
             return
         }
 
-        try {
-            val intent = Intent("com.doubao.action.VOICE_INPUT").apply {
-                setPackage(packageName)
-                putExtra("extra_prompt", "请说出您要发送的内容")
-                putExtra("extra_need_final_only", true)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            startActivity(intent)
-            Log.d("AutoCopierService", "Launched Doubao VOICE_INPUT for package: $packageName")
-        } catch (e: Exception) {
-            Log.e("AutoCopierService", "Failed to start Doubao Voice Input: ${e.message}")
-            Toast.makeText(this, "启动豆包语音输入失败", Toast.LENGTH_SHORT).show()
+        // Step 1: Find and tap the input field (EditText)
+        val editNodes = mutableListOf<android.view.accessibility.AccessibilityNodeInfo>()
+        fun findEdits(node: android.view.accessibility.AccessibilityNodeInfo) {
+            if (node.className?.contains("EditText") == true) editNodes.add(node)
+            for (i in 0 until node.childCount) node.getChild(i)?.let { findEdits(it) }
         }
+        findEdits(rootNode)
+
+        val inputNode = editNodes.firstOrNull()
+        if (inputNode == null) {
+            Log.w("AutoCopierService", "startVoiceInput: no EditText found")
+            return
+        }
+
+        val inputBounds = Rect()
+        inputNode.getBoundsInScreen(inputBounds)
+        val cx = inputBounds.centerX().toFloat()
+        val cy = inputBounds.centerY().toFloat()
+        Log.d("AutoCopierService", "Tapping input field at ($cx, $cy)")
+
+        val path = Path().apply { moveTo(cx, cy) }
+        val tapInputGesture = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(path, 0, 50))
+            .build()
+
+        dispatchGesture(tapInputGesture, object : GestureResultCallback() {
+            override fun onCompleted(g: GestureDescription?) {
+                // Step 2: After keyboard appears, tap the 点击说话 button
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    tapSpeakButton(overlayManager)
+                }, 600)
+            }
+            override fun onCancelled(g: GestureDescription?) {
+                Log.w("AutoCopierService", "Input field tap cancelled")
+            }
+        }, null)
     }
 
-    private fun getDoubaoPackage(): String? {
-        val packages = listOf("com.doubao.app", "com.larus.nova")
-        for (pkg in packages) {
-            try {
-                packageManager.getPackageInfo(pkg, 0)
-                return pkg
-            } catch (e: Exception) {
-                // Not found, continue to next package
+    private fun tapSpeakButton(overlayManager: com.clipreader.overlay.OverlayManager?) {
+        // Doubao IME "点击说话" button is at a fixed position in the keyboard toolbar.
+        // On 1080x2424 screen: approximately x=270, y=1680 (25% left, 69% down).
+        val dm = resources.displayMetrics
+        val tx = dm.widthPixels * 0.25f
+        val ty = dm.heightPixels * 0.695f
+        Log.d("AutoCopierService", "Tapping Doubao speak button at fixed coords ($tx, $ty)")
+
+        val path = Path().apply { moveTo(tx, ty) }
+        val gesture = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(path, 0, 50))
+            .build()
+        dispatchGesture(gesture, object : GestureResultCallback() {
+            override fun onCompleted(g: GestureDescription?) {
+                isListening = true
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    overlayManager?.setMicState(com.clipreader.overlay.OverlayManager.MicState.LISTENING)
+                }
+                Log.d("AutoCopierService", "Voice input started via fixed coordinate.")
             }
-        }
-        return null
+            override fun onCancelled(g: GestureDescription?) {
+                Log.w("AutoCopierService", "Speak button tap cancelled")
+            }
+        }, null)
     }
 
-    /**
-     * Called when Doubao ASR broadcast indicates completion.
-     */
-    fun handleDoubaoAsrResult(text: String) {
-        if (text.isEmpty()) return
-        Log.d("AutoCopierService", "Received ASR result: $text. Attempting to input and send.")
-        
-        // Strategy: 
-        // 1. Find EditText
-        // 2. Set text via AccessibilityNodeInfo.ACTION_SET_TEXT (if possible) or just wait for Doubao to fill it (some ASR intents auto-fill)
-        // 3. Robustly tap Send button
-        
-        // According to common AI app behavior, we might need a small delay for the focus to return
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-            tapSendButton()
-        }, 1000)
+    private fun stopVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
+        // Tap the same coordinate — when recording, "点击说话" becomes "结束" in the same position
+        val dm = resources.displayMetrics
+        val tx = dm.widthPixels * 0.25f
+        val ty = dm.heightPixels * 0.695f
+        Log.d("AutoCopierService", "Tapping stop recording at fixed coords ($tx, $ty)")
+
+        val path = Path().apply { moveTo(tx, ty) }
+        val gesture = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(path, 0, 50))
+            .build()
+        dispatchGesture(gesture, object : GestureResultCallback() {
+            override fun onCompleted(g: GestureDescription?) {
+                // Wait for speech-to-text to transcribe, then tap Send button
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    tapSendButton()
+                }, 1500)
+            }
+        }, null)
+
+        isListening = false
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            overlayManager?.setMicState(com.clipreader.overlay.OverlayManager.MicState.IDLE)
+        }
+        Log.d("AutoCopierService", "Voice input stopped, will auto-send in 1.5s.")
     }
 
     private fun tapSendButton() {

@@ -39,11 +39,7 @@ class ClipReaderService : Service() {
             
             Log.d("ClipReaderService", "Doubao Broadcast: Action=$action, Status=$status, Text=$text")
 
-            if (action == "com.doubao.broadcast.ASR_STATUS") {
-                if (status == "COMPLETE") {
-                    com.clipreader.clipboard.AutoCopierService.instance?.handleDoubaoAsrResult(text)
-                }
-            } else if (action == "com.doubao.broadcast.TTS_STATUS") {
+            if (action == "com.doubao.broadcast.TTS_STATUS") {
                 when (status) {
                     "START" -> ttsManager?.updatePlaybackState(true)
                     "COMPLETE", "ERROR" -> ttsManager?.updatePlaybackState(false)
