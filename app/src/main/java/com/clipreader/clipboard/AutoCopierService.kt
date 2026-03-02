@@ -21,6 +21,8 @@ class AutoCopierService : AccessibilityService() {
     private var lastClickTime = 0L
     private val CLICK_DEBOUNCE_MS = 2000L
 
+    private var previousPackageName: String? = null
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
@@ -46,6 +48,11 @@ class AutoCopierService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
+
+        // Continuously track the active package, so we know what to return to
+        if (pkg != "com.clipreader" && pkg != "com.doubao.app" && pkg != "com.larus.nova") {
+            previousPackageName = pkg
+        }
 
         val isAiApp = TARGET_PACKAGES.any { pkg.contains(it, ignoreCase = true) }
         if (!isAiApp) return
@@ -413,6 +420,34 @@ class AutoCopierService : AccessibilityService() {
         } catch (e: Exception) {
             Log.e("AutoCopierService", "Error launching ClipboardReaderActivity: ${e.message}")
         }
+    }
+
+    /**
+     * Attempts to return to the application that was active before the user switched to Doubao.
+     * @return true if successful, false if no previous package was recorded or the launch intent failed.
+     */
+    fun returnToPreviousApp(): Boolean {
+        val targetPkg = previousPackageName
+        if (targetPkg == null) {
+            Log.w("AutoCopierService", "returnToPreviousApp: No previous package recorded.")
+            return false
+        }
+
+        try {
+            val launchIntent = packageManager.getLaunchIntentForPackage(targetPkg)
+            if (launchIntent != null) {
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) // Try to resume rather than restart
+                startActivity(launchIntent)
+                Log.d("AutoCopierService", "returnToPreviousApp: Launched $targetPkg successfully.")
+                return true
+            } else {
+                Log.w("AutoCopierService", "returnToPreviousApp: No launch intent found for $targetPkg.")
+            }
+        } catch (e: Exception) {
+            Log.e("AutoCopierService", "returnToPreviousApp: Failed to launch $targetPkg: ${e.message}")
+        }
+        return false
     }
 
     private fun findNodesByContentDescription(root: AccessibilityNodeInfo, text: String): List<AccessibilityNodeInfo> {
