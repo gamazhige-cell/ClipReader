@@ -16,3 +16,7 @@ local.properties
 
 # Kotlin
 *.class
+
+# Generated build files
+app/build/
+build/
