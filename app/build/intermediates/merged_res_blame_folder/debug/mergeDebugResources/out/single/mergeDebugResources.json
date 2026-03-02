@@ -28,10 +28,6 @@
         "source": "/Users/william/.gradle/daemon/9.1.0/com.clipreader.app-main-34:/drawable/ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.clipreader.app-debug-32:/drawable_bg_floating_minimal.xml.flat",
-        "source": "com.clipreader.app-main-34:/drawable/bg_floating_minimal.xml"
-    },
-    {
         "merged": "com.clipreader.app-debug-32:/layout_overlay_bubble.xml.flat",
         "source": "com.clipreader.app-main-34:/layout/overlay_bubble.xml"
     },
@@ -58,5 +54,9 @@
     {
         "merged": "/Users/william/.gradle/daemon/9.1.0/com.clipreader.app-debug-32:/drawable_bg_floating_playing.xml.flat",
         "source": "/Users/william/.gradle/daemon/9.1.0/com.clipreader.app-main-34:/drawable/bg_floating_playing.xml"
+    },
+    {
+        "merged": "/Users/william/.gradle/daemon/9.1.0/com.clipreader.app-debug-32:/drawable_bg_floating_minimal.xml.flat",
+        "source": "/Users/william/.gradle/daemon/9.1.0/com.clipreader.app-main-34:/drawable/bg_floating_minimal.xml"
     }
 ]

@@ -15,6 +15,10 @@ id btnStartService
 id btnStopService
 id btnTestFallback
 id btnTestPrimary
+id cardBack
+id cardMic
+id cardPlay
+id cardShare
 id floatingRoot
 id iconBackground
 id iconImage

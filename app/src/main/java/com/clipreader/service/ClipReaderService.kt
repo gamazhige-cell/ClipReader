@@ -88,6 +88,7 @@ class ClipReaderService : Service() {
                 } else {
                     shareToDoubao()
                 }
+                overlayManager?.setNavigationMode(com.clipreader.overlay.OverlayManager.NavigationMode.BACK_ONLY)
             },
             onBack = {
                 val service = com.clipreader.clipboard.AutoCopierService.instance
@@ -95,6 +96,7 @@ class ClipReaderService : Service() {
                     // This is an accessibility service global action
                     service.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK)
                 }
+                overlayManager?.setNavigationMode(com.clipreader.overlay.OverlayManager.NavigationMode.NORMAL)
             },
             onStopService = {
                 stopSelf()

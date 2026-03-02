@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.clipreader.R;
@@ -25,6 +26,18 @@ public final class OverlayBubbleBinding implements ViewBinding {
 
   @NonNull
   public final ImageView backImage;
+
+  @NonNull
+  public final CardView cardBack;
+
+  @NonNull
+  public final CardView cardMic;
+
+  @NonNull
+  public final CardView cardPlay;
+
+  @NonNull
+  public final CardView cardShare;
 
   @NonNull
   public final LinearLayout floatingRoot;
@@ -48,13 +61,18 @@ public final class OverlayBubbleBinding implements ViewBinding {
   public final ImageView shareImage;
 
   private OverlayBubbleBinding(@NonNull LinearLayout rootView, @NonNull FrameLayout backBackground,
-      @NonNull ImageView backImage, @NonNull LinearLayout floatingRoot,
+      @NonNull ImageView backImage, @NonNull CardView cardBack, @NonNull CardView cardMic,
+      @NonNull CardView cardPlay, @NonNull CardView cardShare, @NonNull LinearLayout floatingRoot,
       @NonNull FrameLayout iconBackground, @NonNull ImageView iconImage,
       @NonNull FrameLayout micBackground, @NonNull ImageView micImage,
       @NonNull FrameLayout shareBackground, @NonNull ImageView shareImage) {
     this.rootView = rootView;
     this.backBackground = backBackground;
     this.backImage = backImage;
+    this.cardBack = cardBack;
+    this.cardMic = cardMic;
+    this.cardPlay = cardPlay;
+    this.cardShare = cardShare;
     this.floatingRoot = floatingRoot;
     this.iconBackground = iconBackground;
     this.iconImage = iconImage;
@@ -103,6 +121,30 @@ public final class OverlayBubbleBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.cardBack;
+      CardView cardBack = ViewBindings.findChildViewById(rootView, id);
+      if (cardBack == null) {
+        break missingId;
+      }
+
+      id = R.id.cardMic;
+      CardView cardMic = ViewBindings.findChildViewById(rootView, id);
+      if (cardMic == null) {
+        break missingId;
+      }
+
+      id = R.id.cardPlay;
+      CardView cardPlay = ViewBindings.findChildViewById(rootView, id);
+      if (cardPlay == null) {
+        break missingId;
+      }
+
+      id = R.id.cardShare;
+      CardView cardShare = ViewBindings.findChildViewById(rootView, id);
+      if (cardShare == null) {
+        break missingId;
+      }
+
       LinearLayout floatingRoot = (LinearLayout) rootView;
 
       id = R.id.iconBackground;
@@ -141,9 +183,9 @@ public final class OverlayBubbleBinding implements ViewBinding {
         break missingId;
       }
 
-      return new OverlayBubbleBinding((LinearLayout) rootView, backBackground, backImage,
-          floatingRoot, iconBackground, iconImage, micBackground, micImage, shareBackground,
-          shareImage);
+      return new OverlayBubbleBinding((LinearLayout) rootView, backBackground, backImage, cardBack,
+          cardMic, cardPlay, cardShare, floatingRoot, iconBackground, iconImage, micBackground,
+          micImage, shareBackground, shareImage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

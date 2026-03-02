@@ -3191,6 +3191,10 @@ id buttonPanel
 id cache_measures
 id callMeasure
 id cancel_button
+id cardBack
+id cardMic
+id cardPlay
+id cardShare
 id carryVelocity
 id center
 id centerCrop

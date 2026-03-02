@@ -38,7 +38,15 @@ class OverlayManager(
     private var backBackground: View? = null
     private var backImage: ImageView? = null
 
+    private var cardPlay: View? = null
+    private var cardShare: View? = null
+    private var cardMic: View? = null
+    private var cardBack: View? = null
+
     private var params: WindowManager.LayoutParams? = null
+
+    enum class NavigationMode { NORMAL, BACK_ONLY }
+    private var currentNavigationMode = NavigationMode.NORMAL
 
     enum class State { IDLE, LOADING, PLAYING, ERROR }
     private var currentState = State.IDLE
@@ -77,6 +85,11 @@ class OverlayManager(
         shareImage = floatingView?.findViewById(R.id.shareImage)
         backBackground = floatingView?.findViewById(R.id.backBackground)
         backImage = floatingView?.findViewById(R.id.backImage)
+        
+        cardPlay = floatingView?.findViewById(R.id.cardPlay)
+        cardShare = floatingView?.findViewById(R.id.cardShare)
+        cardMic = floatingView?.findViewById(R.id.cardMic)
+        cardBack = floatingView?.findViewById(R.id.cardBack)
 
         params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -96,6 +109,7 @@ class OverlayManager(
         windowManager?.addView(floatingView, params)
         setState(State.IDLE)
         setMicState(MicState.IDLE)
+        setNavigationMode(NavigationMode.NORMAL)
         
         // Start auto-hide timer
         resetHideTimer()
@@ -105,6 +119,22 @@ class OverlayManager(
         hideHandler.removeCallbacks(hideRunnable)
         floatingView?.alpha = 1.0f
         hideHandler.postDelayed(hideRunnable, 3000)
+    }
+
+    fun setNavigationMode(mode: NavigationMode) {
+        currentNavigationMode = mode
+        if (mode == NavigationMode.NORMAL) {
+            cardPlay?.visibility = View.VISIBLE
+            cardShare?.visibility = View.VISIBLE
+            cardMic?.visibility = View.VISIBLE
+            cardBack?.visibility = View.GONE
+        } else {
+            cardPlay?.visibility = View.GONE
+            cardShare?.visibility = View.GONE
+            cardMic?.visibility = View.GONE
+            cardBack?.visibility = View.VISIBLE
+        }
+        resetHideTimer()
     }
 
     fun setState(state: State) {
@@ -235,14 +265,17 @@ class OverlayManager(
                     } else if (params!!.y >= screenHeight - 300 && !isClick) {
                         onStopService()
                     } else if (isClick) {
-                        // Split by Y: 4 segments: play, share, mic, back
-                        val viewHeight = floatingView?.height ?: 4
-                        val touchY = event.y
-                        when {
-                            touchY < viewHeight * 0.25f -> onPlayPause()
-                            touchY < viewHeight * 0.5f -> onShare()
-                            touchY < viewHeight * 0.75f -> onVoiceInput()
-                            else -> onBack()
+                        if (currentNavigationMode == NavigationMode.BACK_ONLY) {
+                            onBack()
+                        } else {
+                            // Split by Y: 3 segments: play, share, mic
+                            val viewHeight = floatingView?.height ?: 3
+                            val touchY = event.y
+                            when {
+                                touchY < viewHeight * 0.33f -> onPlayPause()
+                                touchY < viewHeight * 0.66f -> onShare()
+                                else -> onVoiceInput()
+                            }
                         }
                     }
                     
