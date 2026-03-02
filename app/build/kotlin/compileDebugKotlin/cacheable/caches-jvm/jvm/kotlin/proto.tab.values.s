@@ -1,0 +1,1 @@
+öPÁLÏLÔMøM×NÒNëPÒOÒPÚQÄTÏT

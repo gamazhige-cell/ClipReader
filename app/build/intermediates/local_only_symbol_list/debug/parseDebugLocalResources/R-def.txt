@@ -1,0 +1,22 @@
+R_DEF: Internal format may change without notice
+local
+drawable bg_floating_idle
+drawable bg_floating_playing
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+id btnStartService
+id btnStopService
+id btnTestFallback
+id btnTestPrimary
+id floatingRoot
+id iconBackground
+id iconImage
+id spinnerFallbackEngine
+id spinnerPrimaryEngine
+layout activity_main
+layout overlay_bubble
+mipmap ic_launcher
+mipmap ic_launcher_round
+string accessibility_service_description
+string app_name
+xml accessibility_service_config

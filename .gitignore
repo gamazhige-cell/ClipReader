@@ -1,0 +1,18 @@
+# Built outputs
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# APKs / bundles
+*.apk
+*.aab
+
+# Kotlin
+*.class

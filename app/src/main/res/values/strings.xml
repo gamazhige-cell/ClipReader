@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ClipReader</string>
+    <string name="accessibility_service_description">自动点击AI对话中的"复制"按钮并联动发音，解放双手自动跟读。</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Clipboard Outline -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M64,26 l0,-8 l-20,0 l0,8 l-10,0 l0,56 l40,0 l0,-56 z M48,22 l12,0 l0,8 l-12,0 z M38,78 l0,-48 l6,0 l0,4 l20,0 l0,-4 l6,0 l0,48 z" />
+        
+    <!-- Sound Waves / Play indication -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,64 c4.4,0 8,-3.6 8,-8 s-3.6,-8 -8,-8 s-8,3.6 -8,8 s3.6,8 8,8 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M66,56 c0,3.6 -1.6,6.8 -4,8.8 l2,2.8 c3,-2.6 5,-6.4 5,-11.6 s-2,-9 -5,-11.6 l-2,2.8 c2.4,2 4,5.2 4,8.8 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,56 c0,-3.6 1.6,-6.8 4,-8.8 l-2,-2.8 c-3,2.6 -5,6.4 -5,11.6 s2,9 5,11.6 l2,-2.8 c-2.4,-2 -4,-5.2 -4,-8.8 z" />
+</vector>

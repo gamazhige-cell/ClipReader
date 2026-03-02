@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_description">自动点击AI对话中的"复制"按钮并联动发音，解放双手自动跟读。</string>
+    <string name="app_name">ClipReader</string>
+</resources>

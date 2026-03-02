@@ -1,0 +1,200 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.clipreader"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="29"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+11-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:5:5-78
+11-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:5:22-75
+12    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+12-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:6:5-77
+12-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:6:22-74
+13    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+13-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:7:5-89
+13-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:7:22-86
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:8:5-67
+14-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:8:22-64
+15    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+15-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:9:5-77
+15-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:9:22-74
+16
+17    <permission
+17-->[androidx.core:core:1.12.0] /Users/william/.gradle/caches/9.1.0/transforms/961f5dfadab63a1bc92e9ed303c781fb/transformed/core-1.12.0/AndroidManifest.xml:22:5-24:47
+18        android:name="com.clipreader.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+18-->[androidx.core:core:1.12.0] /Users/william/.gradle/caches/9.1.0/transforms/961f5dfadab63a1bc92e9ed303c781fb/transformed/core-1.12.0/AndroidManifest.xml:23:9-81
+19        android:protectionLevel="signature" />
+19-->[androidx.core:core:1.12.0] /Users/william/.gradle/caches/9.1.0/transforms/961f5dfadab63a1bc92e9ed303c781fb/transformed/core-1.12.0/AndroidManifest.xml:24:9-44
+20
+21    <uses-permission android:name="com.clipreader.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+21-->[androidx.core:core:1.12.0] /Users/william/.gradle/caches/9.1.0/transforms/961f5dfadab63a1bc92e9ed303c781fb/transformed/core-1.12.0/AndroidManifest.xml:26:5-97
+21-->[androidx.core:core:1.12.0] /Users/william/.gradle/caches/9.1.0/transforms/961f5dfadab63a1bc92e9ed303c781fb/transformed/core-1.12.0/AndroidManifest.xml:26:22-94
+22
+23    <application
+23-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:10:5-55:19
+24        android:allowBackup="true"
+24-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:11:9-35
+25        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+25-->[androidx.core:core:1.12.0] /Users/william/.gradle/caches/9.1.0/transforms/961f5dfadab63a1bc92e9ed303c781fb/transformed/core-1.12.0/AndroidManifest.xml:28:18-86
+26        android:debuggable="true"
+27        android:extractNativeLibs="false"
+28        android:icon="@mipmap/ic_launcher"
+28-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:12:9-43
+29        android:label="@string/app_name"
+29-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:14:9-41
+30        android:roundIcon="@mipmap/ic_launcher_round"
+30-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:13:9-54
+31        android:supportsRtl="true"
+31-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:15:9-35
+32        android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
+32-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:16:9-67
+33        <activity
+33-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:17:9-24:20
+34            android:name="com.clipreader.MainActivity"
+34-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:18:13-41
+35            android:exported="true" >
+35-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:19:13-36
+36            <intent-filter>
+36-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:20:13-23:29
+37                <action android:name="android.intent.action.MAIN" />
+37-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:21:17-69
+37-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:21:25-66
+38
+39                <category android:name="android.intent.category.LAUNCHER" />
+39-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:22:17-77
+39-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:22:27-74
+40            </intent-filter>
+41        </activity>
+42
+43        <!-- Register the Service -->
+44        <service
+44-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:27:9-33:19
+45            android:name="com.clipreader.service.ClipReaderService"
+45-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:28:13-54
+46            android:enabled="true"
+46-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:29:13-35
+47            android:exported="true"
+47-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:30:13-36
+48            android:foregroundServiceType="specialUse" >
+48-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:31:13-55
+49            <property
+49-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:32:13-150
+50                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+50-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:32:23-82
+51                android:value="Clipboard monitoring and floating read-aloud TTS" />
+51-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:32:83-147
+52        </service>
+53
+54        <activity
+54-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:35:9-41:40
+55            android:name="com.clipreader.clipboard.ClipboardReaderActivity"
+55-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:36:13-62
+56            android:excludeFromRecents="true"
+56-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:38:13-46
+57            android:exported="false"
+57-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:41:13-37
+58            android:launchMode="singleInstance"
+58-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:40:13-48
+59            android:taskAffinity=""
+59-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:39:13-36
+60            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+60-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:37:13-72
+61
+62        <service
+62-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:43:9-54:19
+63            android:name="com.clipreader.clipboard.AutoCopierService"
+63-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:44:13-56
+64            android:exported="true"
+64-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:47:13-36
+65            android:label="ClipReader 自动复制与朗读"
+65-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:45:13-47
+66            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+66-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:46:13-79
+67            <intent-filter>
+67-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:48:13-50:29
+68                <action android:name="android.accessibilityservice.AccessibilityService" />
+68-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:49:17-92
+68-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:49:25-89
+69            </intent-filter>
+70
+71            <meta-data
+71-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:51:13-53:72
+72                android:name="android.accessibilityservice"
+72-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:52:17-60
+73                android:resource="@xml/accessibility_service_config" />
+73-->/Users/william/Project/TTSAI/ClipReader/app/src/main/AndroidManifest.xml:53:17-69
+74        </service>
+75
+76        <provider
+76-->[androidx.emoji2:emoji2:1.2.0] /Users/william/.gradle/caches/9.1.0/transforms/76fc40bf64de44911739e7297deb8c24/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+77            android:name="androidx.startup.InitializationProvider"
+77-->[androidx.emoji2:emoji2:1.2.0] /Users/william/.gradle/caches/9.1.0/transforms/76fc40bf64de44911739e7297deb8c24/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+78            android:authorities="com.clipreader.androidx-startup"
+78-->[androidx.emoji2:emoji2:1.2.0] /Users/william/.gradle/caches/9.1.0/transforms/76fc40bf64de44911739e7297deb8c24/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+79            android:exported="false" >
+79-->[androidx.emoji2:emoji2:1.2.0] /Users/william/.gradle/caches/9.1.0/transforms/76fc40bf64de44911739e7297deb8c24/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+80            <meta-data
+80-->[androidx.emoji2:emoji2:1.2.0] /Users/william/.gradle/caches/9.1.0/transforms/76fc40bf64de44911739e7297deb8c24/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+81                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+81-->[androidx.emoji2:emoji2:1.2.0] /Users/william/.gradle/caches/9.1.0/transforms/76fc40bf64de44911739e7297deb8c24/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+82                android:value="androidx.startup" />
+82-->[androidx.emoji2:emoji2:1.2.0] /Users/william/.gradle/caches/9.1.0/transforms/76fc40bf64de44911739e7297deb8c24/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+83            <meta-data
+83-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/william/.gradle/caches/9.1.0/transforms/bafc6b4c05c5a8b1dff17910c0ed4501/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:29:13-31:52
+84                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+84-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/william/.gradle/caches/9.1.0/transforms/bafc6b4c05c5a8b1dff17910c0ed4501/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:30:17-78
+85                android:value="androidx.startup" />
+85-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/william/.gradle/caches/9.1.0/transforms/bafc6b4c05c5a8b1dff17910c0ed4501/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:31:17-49
+86            <meta-data
+86-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+87                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+87-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+88                android:value="androidx.startup" />
+88-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+89        </provider>
+90
+91        <receiver
+91-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+92            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+92-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+93            android:directBootAware="false"
+93-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+94            android:enabled="true"
+94-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+95            android:exported="true"
+95-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+96            android:permission="android.permission.DUMP" >
+96-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+97            <intent-filter>
+97-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+98                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+98-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+98-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+99            </intent-filter>
+100            <intent-filter>
+100-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+101                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+101-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+101-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+102            </intent-filter>
+103            <intent-filter>
+103-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+104                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+104-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+104-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+105            </intent-filter>
+106            <intent-filter>
+106-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+107                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+107-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+107-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/william/.gradle/caches/9.1.0/transforms/93e516637b45548da7fc7f2aae1b7728/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92
+108            </intent-filter>
+109        </receiver>
+110    </application>
+111
+112</manifest>
