@@ -168,19 +168,22 @@ class TTSManager(
     fun stop() {
         azureEngine?.close()
         azureEngine = null
-
-        android.os.Handler(android.os.Looper.getMainLooper()).post {
-            try {
-                mediaPlayer?.stop()
-            } catch (e: Exception) {}
-            mediaPlayer?.release()
-            mediaPlayer = null
-        }
-
+        safeReleaseMediaPlayer()
         systemEngine?.stop()
-
         isPlaying = false
         onStateChange(false)
+    }
+
+    private fun safeReleaseMediaPlayer() {
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            val mp = mediaPlayer
+            mediaPlayer = null
+            if (mp != null) {
+                try { mp.stop() } catch (_: Exception) {}
+                try { mp.reset() } catch (_: Exception) {}
+                try { mp.release() } catch (_: Exception) {}
+            }
+        }
     }
 
     fun release() {
