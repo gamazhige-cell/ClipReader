@@ -11,6 +11,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import android.util.Log
 import com.clipreader.clipboard.ClipboardMonitor
 import com.clipreader.overlay.OverlayManager
 import com.clipreader.tts.TTSManager
@@ -29,6 +30,29 @@ class ClipReaderService : Service() {
     private var ttsManager: TTSManager? = null
     private val client = OkHttpClient()
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    private val doubaoReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
+            val action = intent?.action ?: return
+            val status = intent.getStringExtra("status") // START / PAUSE / COMPLETE / ERROR
+            val text = intent.getStringExtra("text") ?: ""
+            
+            Log.d("ClipReaderService", "Doubao Broadcast: Action=$action, Status=$status, Text=$text")
+
+            if (action == "com.doubao.broadcast.ASR_STATUS") {
+                if (status == "COMPLETE") {
+                    com.clipreader.clipboard.AutoCopierService.instance?.handleDoubaoAsrResult(text)
+                }
+            } else if (action == "com.doubao.broadcast.TTS_STATUS") {
+                when (status) {
+                    "START" -> ttsManager?.updatePlaybackState(true)
+                    "COMPLETE", "ERROR" -> ttsManager?.updatePlaybackState(false)
+                }
+            } else if (action == "com.clipreader.ACTION_SHARE_TO_DOUBAO") {
+                shareToDoubao()
+            }
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -60,6 +84,14 @@ class ClipReaderService : Service() {
             },
             onVoiceInput = {
                 com.clipreader.clipboard.AutoCopierService.instance?.tryVoiceInput(overlayManager)
+            },
+            onShare = {
+                val service = com.clipreader.clipboard.AutoCopierService.instance
+                if (service != null) {
+                    service.tryCopyAndShare()
+                } else {
+                    shareToDoubao()
+                }
             },
             onStopService = {
                 stopSelf()
@@ -98,6 +130,17 @@ class ClipReaderService : Service() {
 
         overlayManager?.show()
         clipboardMonitor?.start()
+
+        val filter = android.content.IntentFilter().apply {
+            addAction("com.doubao.broadcast.TTS_STATUS")
+            addAction("com.doubao.broadcast.ASR_STATUS")
+            addAction("com.clipreader.ACTION_SHARE_TO_DOUBAO")
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(doubaoReceiver, filter, android.content.Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(doubaoReceiver, filter)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -123,6 +166,9 @@ class ClipReaderService : Service() {
         clipboardMonitor?.stop()
         ttsManager?.stop()
         overlayManager?.remove()
+        try {
+            unregisterReceiver(doubaoReceiver)
+        } catch (_: Exception) {}
     }
 
     private fun createNotificationChannel() {
@@ -143,5 +189,52 @@ class ClipReaderService : Service() {
             .setContentText("Listening to clipboard...")
             .setSmallIcon(android.R.drawable.ic_btn_speak_now)
             .build()
+    }
+
+    private fun shareToDoubao() {
+        val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clipData = clipboard.primaryClip
+        val text = if (clipData != null && clipData.itemCount > 0) {
+            clipData.getItemAt(0).text?.toString() ?: ""
+        } else ""
+
+        if (text.isEmpty()) {
+            Toast.makeText(this, "剪贴板为空", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val prompt = "将以下内容原文输出：\n\n"
+        val shareText = prompt + text
+
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        // Try to target Doubao directly if possible
+        val packages = listOf("com.larus.nova", "com.doubao.app")
+        var targeted = false
+        for (pkg in packages) {
+            try {
+                packageManager.getPackageInfo(pkg, 0)
+                sendIntent.setPackage(pkg)
+                targeted = true
+                break
+            } catch (e: Exception) {}
+        }
+
+        try {
+            if (targeted) {
+                startActivity(sendIntent)
+            } else {
+                val shareIntent = Intent.createChooser(sendIntent, "分享到豆包")
+                shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(shareIntent)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "无法启动分享: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 }

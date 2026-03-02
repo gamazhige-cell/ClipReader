@@ -19,6 +19,7 @@ class OverlayManager(
     private val context: Context,
     private val onPlayPause: () -> Unit,
     private val onVoiceInput: () -> Unit,
+    private val onShare: () -> Unit,
     private val onStopService: () -> Unit
 ) {
     private var windowManager: WindowManager? = null
@@ -29,6 +30,8 @@ class OverlayManager(
     private var iconImage: ImageView? = null
     private var micBackground: View? = null
     private var micImage: ImageView? = null
+    private var shareBackground: View? = null
+    private var shareImage: ImageView? = null
 
     private var params: WindowManager.LayoutParams? = null
 
@@ -60,6 +63,8 @@ class OverlayManager(
         iconImage = floatingView?.findViewById(R.id.iconImage)
         micBackground = floatingView?.findViewById(R.id.micBackground)
         micImage = floatingView?.findViewById(R.id.micImage)
+        shareBackground = floatingView?.findViewById(R.id.shareBackground)
+        shareImage = floatingView?.findViewById(R.id.shareImage)
 
         params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -132,6 +137,9 @@ class OverlayManager(
         micBackground?.setOnClickListener {
             onVoiceInput()
         }
+        shareBackground?.setOnClickListener {
+            onShare()
+        }
     }
 
     private fun setupDragListener() {
@@ -171,13 +179,13 @@ class OverlayManager(
                     } else if (params!!.y >= screenHeight - 300 && !isClick) {
                         onStopService()
                     } else if (isClick) {
-                        // Split by Y: top half = play, bottom half = mic
-                        val viewHeight = floatingView?.height ?: 2
+                        // Split by Y: 3 segments: top = play, middle = share, bottom = mic
+                        val viewHeight = floatingView?.height ?: 3
                         val touchY = event.y
-                        if (touchY < viewHeight / 2f) {
-                            onPlayPause()
-                        } else {
-                            onVoiceInput()
+                        when {
+                            touchY < viewHeight / 3f -> onPlayPause()
+                            touchY < 2 * viewHeight / 3f -> onShare()
+                            else -> onVoiceInput()
                         }
                     }
                     true

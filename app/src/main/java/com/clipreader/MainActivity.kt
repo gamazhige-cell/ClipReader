@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         val spinnerPrimary = findViewById<Spinner>(R.id.spinnerPrimaryEngine)
         val spinnerFallback = findViewById<Spinner>(R.id.spinnerFallbackEngine)
 
-        val options = arrayOf("Microsoft Azure TTS", "System TTS (本机离线)")
+        val options = arrayOf("Doubao App", "Microsoft Azure TTS", "System TTS (本机离线)")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, options)
         spinnerPrimary.adapter = adapter
         spinnerFallback.adapter = adapter
@@ -37,12 +37,21 @@ class MainActivity : AppCompatActivity() {
         // Set previous selections or defaults
         val pEngine = prefsManager.getPrimaryEngine()
         val fEngine = prefsManager.getFallbackEngine()
-        spinnerPrimary.setSelection(if (pEngine == "System TTS") 1 else 0)
-        spinnerFallback.setSelection(if (fEngine == "Microsoft Azure TTS") 0 else 1)
+        
+        spinnerPrimary.setSelection(when(pEngine) {
+            "Doubao App" -> 0
+            "Microsoft Azure TTS" -> 1
+            else -> 2
+        })
+        spinnerFallback.setSelection(when(fEngine) {
+            "Doubao App" -> 0
+            "Microsoft Azure TTS" -> 1
+            else -> 2
+        })
 
         findViewById<Button>(R.id.btnStartService).setOnClickListener {
-            val selectedPrimary = if (spinnerPrimary.selectedItemPosition == 0) "Microsoft Azure TTS" else "System TTS"
-            val selectedFallback = if (spinnerFallback.selectedItemPosition == 0) "Microsoft Azure TTS" else "System TTS"
+            val selectedPrimary = options[spinnerPrimary.selectedItemPosition]
+            val selectedFallback = options[spinnerFallback.selectedItemPosition]
             
             prefsManager.savePrimaryEngine(selectedPrimary)
             prefsManager.saveFallbackEngine(selectedFallback)
@@ -53,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnTestPrimary).setOnClickListener {
-            val selectedEngine = if (spinnerPrimary.selectedItemPosition == 0) "Microsoft Azure TTS" else "System TTS"
+            val selectedEngine = options[spinnerPrimary.selectedItemPosition]
             
             val intent = Intent(this, ClipReaderService::class.java).apply {
                 action = "ACTION_TEST_ENGINE"
@@ -67,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnTestFallback).setOnClickListener {
-            val selectedEngine = if (spinnerFallback.selectedItemPosition == 0) "Microsoft Azure TTS" else "System TTS"
+            val selectedEngine = options[spinnerFallback.selectedItemPosition]
             
             val intent = Intent(this, ClipReaderService::class.java).apply {
                 action = "ACTION_TEST_ENGINE"

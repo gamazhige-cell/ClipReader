@@ -12,7 +12,7 @@ class SystemTTSEngine(
     private val onStart: () -> Unit,
     private val onDone: () -> Unit,
     private val onError: (String) -> Unit
-) : TextToSpeech.OnInitListener {
+) : TextToSpeech.OnInitListener, TTSEngine {
 
     private var tts: TextToSpeech? = null
     private var isInitialized = false
@@ -56,6 +56,10 @@ class SystemTTSEngine(
         })
     }
 
+    override fun play(text: String) {
+        synthesize(text)
+    }
+
     fun synthesize(text: String) {
         if (!isInitialized) {
             pendingText = text
@@ -71,11 +75,11 @@ class SystemTTSEngine(
         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
     }
 
-    fun stop() {
+    override fun stop() {
         tts?.stop()
     }
 
-    fun close() {
+    override fun release() {
         tts?.stop()
         tts?.shutdown()
         tts = null

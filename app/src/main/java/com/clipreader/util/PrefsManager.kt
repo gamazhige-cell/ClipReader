@@ -22,7 +22,7 @@ class PrefsManager(context: Context) {
     }
 
     fun getPrimaryEngine(): String? {
-        return sharedPreferences.getString("primary_engine", "Edge TTS (推荐)")
+        return sharedPreferences.getString("primary_engine", "Doubao App")
     }
 
     fun saveFallbackEngine(engine: String) {

@@ -19,7 +19,7 @@ class AzureTTSEngine(
     private val onAudioData: (ByteArray) -> Unit,
     private val onEnd: () -> Unit,
     private val onError: (String) -> Unit
-) {
+) : TTSEngine {
     private var currentCall: Call? = null
 
     private fun mkssml(text: String): String {
@@ -35,6 +35,10 @@ class AzureTTSEngine(
                 </voice>
             </speak>
         """.trimIndent()
+    }
+
+    override fun play(text: String) {
+        synthesize(text)
     }
 
     fun synthesize(text: String) {
@@ -108,8 +112,16 @@ class AzureTTSEngine(
         })
     }
 
-    fun close() {
+    override fun stop() {
         currentCall?.cancel()
         currentCall = null
+    }
+
+    override fun release() {
+        stop()
+    }
+
+    fun close() {
+        stop()
     }
 }
