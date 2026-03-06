@@ -3192,6 +3192,7 @@ id cache_measures
 id callMeasure
 id cancel_button
 id cardBack
+id cardExit
 id cardMic
 id cardPlay
 id cardShare
@@ -3264,6 +3265,8 @@ id easeInOut
 id easeOut
 id east
 id edge
+id editAzureKey
+id editAzureRegion
 id edit_query
 id edit_text_id
 id elastic
@@ -3272,6 +3275,8 @@ id end
 id endToStart
 id enterAlways
 id enterAlwaysCollapsed
+id exitBackground
+id exitImage
 id exitUntilCollapsed
 id expand_activities_button
 id expanded_menu

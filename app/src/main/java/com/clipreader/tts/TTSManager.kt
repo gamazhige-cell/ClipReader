@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.util.Log
 import com.clipreader.util.PrefsManager
 import okhttp3.OkHttpClient
+import java.security.MessageDigest
 import java.io.File
 import java.io.FileOutputStream
 
@@ -14,18 +15,37 @@ class TTSManager(
     private val onStateChange: (Boolean) -> Unit,
     private val onError: (String) -> Unit
 ) {
+    companion object {
+        private const val AZURE_ENGINE_NAME = "Microsoft Azure TTS"
+        private const val AZURE_CACHE_FILE_PREFIX = "tts_cache_"
+        private const val AZURE_CACHE_FILE_SUFFIX = ".mp3"
+        private const val MAX_AZURE_CACHE_FILES = 50
+        private const val MAX_AZURE_CACHE_BYTES = 100L * 1024L * 1024L
+    }
+
     private var currentEngine: TTSEngine? = null
     var isPlaying = false
         private set
 
-    private fun getEngine(engineName: String, onStart: () -> Unit, onDone: () -> Unit, onError: (String) -> Unit): TTSEngine {
+    private fun getEngine(
+        engineName: String,
+        onStart: () -> Unit,
+        onDone: () -> Unit,
+        onError: (String) -> Unit,
+        azureCacheKey: String?
+    ): TTSEngine {
         return when (engineName) {
-            "Microsoft Azure TTS" -> AzureTTSEngine(
-                client = client,
-                onAudioData = { mp3Bytes -> playMp3Bytes(mp3Bytes) },
-                onEnd = { /* Handled by MediaPlayer */ },
-                onError = { msg -> onError(msg) }
-            )
+            AZURE_ENGINE_NAME -> {
+                val prefs = PrefsManager(context)
+                AzureTTSEngine(
+                    client = client,
+                    apiKey = prefs.getAzureKey() ?: "",
+                    region = prefs.getAzureRegion() ?: "eastasia",
+                    onAudioData = { mp3Bytes -> playMp3Bytes(mp3Bytes, azureCacheKey) },
+                    onEnd = { /* Handled by MediaPlayer */ },
+                    onError = { msg -> onError(msg) }
+                )
+            }
             "Doubao App" -> DoubaoAppEngine(
                 context = context,
                 onStart = onStart,
@@ -57,6 +77,20 @@ class TTSManager(
     }
 
     private fun playWithEngine(engineName: String, text: String, isPrimary: Boolean) {
+        val prefs = PrefsManager(context)
+        val azureRegion = prefs.getAzureRegion() ?: "eastasia"
+        val azureCacheKey = if (engineName == AZURE_ENGINE_NAME) buildAzureCacheKey(text, azureRegion) else null
+        if (azureCacheKey != null) {
+            val cached = getAzureCacheFile(azureCacheKey)
+            if (cached.exists() && cached.length() > 1024L) {
+                Log.d("TTSManager", "Reusing cached Azure MP3 for current text")
+                playMp3File(cached)
+                return
+            } else if (cached.exists()) {
+                cached.delete()
+            }
+        }
+
         isPlaying = true
         onStateChange(true)
 
@@ -78,46 +112,74 @@ class TTSManager(
                     stop()
                     onError("引擎测试失败: $msg")
                 }
-            }
+            },
+            azureCacheKey = azureCacheKey
         )
         currentEngine?.play(text)
     }
 
-    private fun playMp3Bytes(mp3Bytes: ByteArray) {
+    private fun playMp3Bytes(mp3Bytes: ByteArray, cacheKey: String?) {
         try {
-            val tempFile = File(context.cacheDir, "tts_audio.mp3")
-            FileOutputStream(tempFile).use { it.write(mp3Bytes) }
-
-            android.os.Handler(android.os.Looper.getMainLooper()).post {
-                try {
-                    mediaPlayer?.release()
-                    val mp = MediaPlayer()
-                    mediaPlayer = mp
-                    mp.setDataSource(tempFile.absolutePath)
-                    mp.setOnPreparedListener { player ->
-                        player.start()
-                    }
-                    mp.setOnCompletionListener {
-                        isPlaying = false
-                        onStateChange(false)
-                    }
-                    mp.setOnErrorListener { _, what, extra ->
-                        onError("音频播放失败 ($what)")
-                        isPlaying = false
-                        onStateChange(false)
-                        true
-                    }
-                    mp.prepareAsync()
-                } catch (e: Exception) {
-                    onError("创建播放器失败: ${e.message}")
-                    isPlaying = false
-                    onStateChange(false)
+            val targetFile = if (cacheKey != null) {
+                val finalFile = getAzureCacheFile(cacheKey)
+                val tempFile = File(context.cacheDir, "${finalFile.name}.tmp")
+                FileOutputStream(tempFile).use { it.write(mp3Bytes) }
+                if (finalFile.exists()) {
+                    finalFile.delete()
                 }
+                if (!tempFile.renameTo(finalFile)) {
+                    throw IllegalStateException("无法原子写入缓存文件")
+                }
+                enforceAzureCacheLimits()
+                finalFile
+            } else {
+                val tempFile = File(context.cacheDir, "tts_audio.mp3.tmp")
+                val finalFile = File(context.cacheDir, "tts_audio.mp3")
+                FileOutputStream(tempFile).use { it.write(mp3Bytes) }
+                if (finalFile.exists()) {
+                    finalFile.delete()
+                }
+                if (!tempFile.renameTo(finalFile)) {
+                    throw IllegalStateException("无法写入临时播放文件")
+                }
+                finalFile
             }
+            playMp3File(targetFile)
         } catch (e: Exception) {
             onError("保存音频失败: ${e.message}")
             isPlaying = false
             onStateChange(false)
+        }
+    }
+
+    private fun playMp3File(file: File) {
+        isPlaying = true
+        onStateChange(true)
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            try {
+                mediaPlayer?.release()
+                val mp = MediaPlayer()
+                mediaPlayer = mp
+                mp.setDataSource(file.absolutePath)
+                mp.setOnPreparedListener { player ->
+                    player.start()
+                }
+                mp.setOnCompletionListener {
+                    isPlaying = false
+                    onStateChange(false)
+                }
+                mp.setOnErrorListener { _, what, _ ->
+                    onError("音频播放失败 ($what)")
+                    isPlaying = false
+                    onStateChange(false)
+                    true
+                }
+                mp.prepareAsync()
+            } catch (e: Exception) {
+                onError("创建播放器失败: ${e.message}")
+                isPlaying = false
+                onStateChange(false)
+            }
         }
     }
 
@@ -130,6 +192,51 @@ class TTSManager(
         Log.d("TTSManager", "Falling back to: $fallback")
         stopEnginesOnly()
         playWithEngine(fallback, text, isPrimary = false)
+    }
+
+    private fun buildAzureCacheKey(text: String, azureRegion: String): String {
+        val normalized = text
+            .replace("\r\n", "\n")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+        val keyMaterial = listOf(
+            AZURE_ENGINE_NAME,
+            "zh-CN-XiaoxiaoNeural",
+            "audio-24khz-48kbitrate-mono-mp3",
+            azureRegion,
+            normalized
+        ).joinToString("|")
+        val digest = MessageDigest.getInstance("SHA-256").digest(keyMaterial.toByteArray(Charsets.UTF_8))
+        return digest.joinToString("") { "%02x".format(it) }
+    }
+
+    private fun getAzureCacheFile(cacheKey: String): File {
+        return File(context.cacheDir, "${AZURE_CACHE_FILE_PREFIX}$cacheKey$AZURE_CACHE_FILE_SUFFIX")
+    }
+
+    private fun enforceAzureCacheLimits() {
+        val files = context.cacheDir.listFiles { file ->
+            file.isFile && file.name.startsWith(AZURE_CACHE_FILE_PREFIX) && file.name.endsWith(AZURE_CACHE_FILE_SUFFIX)
+        }?.toMutableList() ?: return
+
+        var totalBytes = files.sumOf { it.length() }
+        if (files.size <= MAX_AZURE_CACHE_FILES && totalBytes <= MAX_AZURE_CACHE_BYTES) {
+            return
+        }
+
+        files.sortBy { it.lastModified() }
+        var index = 0
+        while ((files.size - index) > MAX_AZURE_CACHE_FILES || totalBytes > MAX_AZURE_CACHE_BYTES) {
+            if (index >= files.size) {
+                break
+            }
+            val fileToDelete = files[index]
+            val size = fileToDelete.length()
+            if (fileToDelete.delete()) {
+                totalBytes -= size
+            }
+            index += 1
+        }
     }
 
     private fun stopEnginesOnly() {

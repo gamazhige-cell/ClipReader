@@ -44,7 +44,7 @@ class ClipboardReaderActivity : Activity() {
                 if (!text.isNullOrBlank()) {
                     val cleaned = stripMarkdown(text)
                     val contentToPlay = if (cleaned.length > 2000) cleaned.substring(0, 2000) else cleaned
-                    Log.d("ClipboardReader", "Read text (cleaned): $contentToPlay")
+                    Log.d("ClipboardReader", "Read text for action=$actionType, length=${contentToPlay.length}")
                     
                     if (actionType == "SHARE") {
                         // Send intent to service to share the text

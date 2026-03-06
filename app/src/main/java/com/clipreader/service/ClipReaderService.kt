@@ -9,9 +9,9 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import android.util.Log
 import com.clipreader.clipboard.ClipboardMonitor
 import com.clipreader.overlay.OverlayManager
 import com.clipreader.tts.TTSManager
@@ -35,9 +35,9 @@ class ClipReaderService : Service() {
         override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
             val action = intent?.action ?: return
             val status = intent.getStringExtra("status") // START / PAUSE / COMPLETE / ERROR
-            val text = intent.getStringExtra("text") ?: ""
+            val textLength = intent.getStringExtra("text")?.length ?: 0
             
-            Log.d("ClipReaderService", "Doubao Broadcast: Action=$action, Status=$status, Text=$text")
+            Log.d("ClipReaderService", "Doubao Broadcast: Action=$action, Status=$status, TextLength=$textLength")
 
             if (action == "com.doubao.broadcast.TTS_STATUS") {
                 when (status) {
@@ -79,6 +79,7 @@ class ClipReaderService : Service() {
                 }
             },
             onVoiceInput = {
+                ttsManager?.stop()
                 com.clipreader.clipboard.AutoCopierService.instance?.tryVoiceInput(overlayManager)
             },
             onShare = {
@@ -182,7 +183,9 @@ class ClipReaderService : Service() {
         overlayManager?.remove()
         try {
             unregisterReceiver(doubaoReceiver)
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            Log.w("ClipReaderService", "Receiver already unregistered or unavailable", e)
+        }
     }
 
     private fun createNotificationChannel() {
@@ -240,7 +243,9 @@ class ClipReaderService : Service() {
                 sendIntent.setPackage(pkg)
                 targeted = true
                 break
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+                Log.d("ClipReaderService", "Package not available: $pkg")
+            }
         }
 
         try {

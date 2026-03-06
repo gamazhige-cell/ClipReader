@@ -22,7 +22,7 @@ class PrefsManager(context: Context) {
     }
 
     fun getPrimaryEngine(): String? {
-        return sharedPreferences.getString("primary_engine", "Doubao App")
+        return sharedPreferences.getString("primary_engine", "Microsoft Azure TTS")
     }
 
     fun saveFallbackEngine(engine: String) {
@@ -31,5 +31,21 @@ class PrefsManager(context: Context) {
 
     fun getFallbackEngine(): String? {
         return sharedPreferences.getString("fallback_engine", "System TTS (本机离线)")
+    }
+
+    fun saveAzureKey(key: String) {
+        sharedPreferences.edit().putString("azure_api_key", key).apply()
+    }
+
+    fun getAzureKey(): String? {
+        return sharedPreferences.getString("azure_api_key", "")
+    }
+
+    fun saveAzureRegion(region: String) {
+        sharedPreferences.edit().putString("azure_region", region).apply()
+    }
+
+    fun getAzureRegion(): String? {
+        return sharedPreferences.getString("azure_region", "eastasia")
     }
 }

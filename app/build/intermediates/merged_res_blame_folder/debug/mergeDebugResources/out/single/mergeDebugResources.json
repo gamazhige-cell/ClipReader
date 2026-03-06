@@ -24,6 +24,10 @@
         "source": "/Users/william/.gradle/daemon/9.1.0/com.clipreader.app-main-34:/drawable/bg_floating_idle.xml"
     },
     {
+        "merged": "com.clipreader.app-debug-32:/layout_activity_main.xml.flat",
+        "source": "com.clipreader.app-main-34:/layout/activity_main.xml"
+    },
+    {
         "merged": "/Users/william/.gradle/daemon/9.1.0/com.clipreader.app-debug-32:/drawable_ic_launcher_foreground.xml.flat",
         "source": "/Users/william/.gradle/daemon/9.1.0/com.clipreader.app-main-34:/drawable/ic_launcher_foreground.xml"
     },

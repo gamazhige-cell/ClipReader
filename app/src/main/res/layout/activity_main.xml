@@ -74,6 +74,30 @@
             android:text="测试选中引擎" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Azure 配置 (仅在使用 Azure TTS 时需要)"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/editAzureKey"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Azure API Key"
+        android:inputType="textPassword"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/editAzureRegion"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Azure Region (如 eastasia)"
+        android:inputType="text"
+        android:layout_marginBottom="16dp" />
+
     <Button
         android:id="@+id/btnStartService"
         android:layout_width="match_parent"

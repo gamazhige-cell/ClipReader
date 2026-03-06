@@ -16,9 +16,14 @@ id btnStopService
 id btnTestFallback
 id btnTestPrimary
 id cardBack
+id cardExit
 id cardMic
 id cardPlay
 id cardShare
+id editAzureKey
+id editAzureRegion
+id exitBackground
+id exitImage
 id floatingRoot
 id iconBackground
 id iconImage

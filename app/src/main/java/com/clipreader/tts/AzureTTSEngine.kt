@@ -14,8 +14,8 @@ import java.io.IOException
 class AzureTTSEngine(
     private val client: OkHttpClient,
     private val voice: String = "zh-CN-XiaoxiaoNeural",
-    private val apiKey: String = com.clipreader.BuildConfig.AZURE_API_KEY,
-    private val region: String = com.clipreader.BuildConfig.AZURE_REGION,
+    private val apiKey: String,
+    private val region: String,
     private val onAudioData: (ByteArray) -> Unit,
     private val onEnd: () -> Unit,
     private val onError: (String) -> Unit

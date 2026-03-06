@@ -4,6 +4,7 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
+import android.util.Log
 
 class AudioPlayerHelper(
     private val sampleRate: Int = 24000
@@ -72,7 +73,9 @@ class AudioPlayerHelper(
             if (it.state == AudioTrack.STATE_INITIALIZED) {
                 try {
                     it.stop()
-                } catch (e: Exception) {}
+                } catch (e: Exception) {
+                    Log.w("AudioPlayerHelper", "AudioTrack stop failed", e)
+                }
             }
             it.release()
         }

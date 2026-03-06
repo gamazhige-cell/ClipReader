@@ -19,6 +19,8 @@ import com.clipreader.util.PrefsManager
 class MainActivity : AppCompatActivity() {
     private val PERMISSION_REQUEST_CODE = 1001
     private lateinit var prefsManager: PrefsManager
+    private lateinit var editAzureKey: android.widget.EditText
+    private lateinit var editAzureRegion: android.widget.EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         val spinnerPrimary = findViewById<Spinner>(R.id.spinnerPrimaryEngine)
         val spinnerFallback = findViewById<Spinner>(R.id.spinnerFallbackEngine)
 
-        val options = arrayOf("Doubao App", "Microsoft Azure TTS", "System TTS (本机离线)")
+        val options = arrayOf("Microsoft Azure TTS", "System TTS (本机离线)")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, options)
         spinnerPrimary.adapter = adapter
         spinnerFallback.adapter = adapter
@@ -39,15 +41,19 @@ class MainActivity : AppCompatActivity() {
         val fEngine = prefsManager.getFallbackEngine()
         
         spinnerPrimary.setSelection(when(pEngine) {
-            "Doubao App" -> 0
-            "Microsoft Azure TTS" -> 1
-            else -> 2
+            "Microsoft Azure TTS" -> 0
+            else -> 1
         })
         spinnerFallback.setSelection(when(fEngine) {
-            "Doubao App" -> 0
-            "Microsoft Azure TTS" -> 1
-            else -> 2
+            "Microsoft Azure TTS" -> 0
+            else -> 1
         })
+
+        editAzureKey = findViewById(R.id.editAzureKey)
+        editAzureRegion = findViewById(R.id.editAzureRegion)
+
+        editAzureKey.setText(prefsManager.getAzureKey())
+        editAzureRegion.setText(prefsManager.getAzureRegion())
 
         findViewById<Button>(R.id.btnStartService).setOnClickListener {
             val selectedPrimary = options[spinnerPrimary.selectedItemPosition]
@@ -55,6 +61,8 @@ class MainActivity : AppCompatActivity() {
             
             prefsManager.savePrimaryEngine(selectedPrimary)
             prefsManager.saveFallbackEngine(selectedFallback)
+            prefsManager.saveAzureKey(editAzureKey.text.toString())
+            prefsManager.saveAzureRegion(editAzureRegion.text.toString())
 
             if (checkPermissions()) {
                 startClipReaderService()
@@ -64,6 +72,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnTestPrimary).setOnClickListener {
             val selectedEngine = options[spinnerPrimary.selectedItemPosition]
             
+            prefsManager.saveAzureKey(editAzureKey.text.toString())
+            prefsManager.saveAzureRegion(editAzureRegion.text.toString())
+
             val intent = Intent(this, ClipReaderService::class.java).apply {
                 action = "ACTION_TEST_ENGINE"
                 putExtra("ENGINE_NAME", selectedEngine)
@@ -78,6 +89,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnTestFallback).setOnClickListener {
             val selectedEngine = options[spinnerFallback.selectedItemPosition]
             
+            prefsManager.saveAzureKey(editAzureKey.text.toString())
+            prefsManager.saveAzureRegion(editAzureRegion.text.toString())
+
             val intent = Intent(this, ClipReaderService::class.java).apply {
                 action = "ACTION_TEST_ENGINE"
                 putExtra("ENGINE_NAME", selectedEngine)

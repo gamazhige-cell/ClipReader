@@ -10,6 +10,7 @@ import android.util.Log
 import android.widget.Toast
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityWindowInfo
 
 class AutoCopierService : AccessibilityService() {
 
@@ -45,6 +46,8 @@ class AutoCopierService : AccessibilityService() {
         "com.anthropic"
     )
 
+    private var wasAutoStarted = false
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
@@ -54,14 +57,28 @@ class AutoCopierService : AccessibilityService() {
             previousPackageName = pkg
         }
 
+        // Only auto-start/stop for Claude or other specified AI apps
         val isAiApp = TARGET_PACKAGES.any { pkg.contains(it, ignoreCase = true) }
-        if (!isAiApp) return
-
-        // Auto-start ClipReaderService if not already running
-        if (!com.clipreader.service.ClipReaderService.isRunning) {
-            Log.d("AutoCopierService", "Detected AI app: $pkg. Auto-starting ClipReaderService.")
-            val intent = android.content.Intent(this, com.clipreader.service.ClipReaderService::class.java)
-            startForegroundService(intent)
+        
+        if (isAiApp) {
+            // Auto-start ClipReaderService if not already running
+            if (!com.clipreader.service.ClipReaderService.isRunning) {
+                Log.d("AutoCopierService", "Detected AI app: $pkg. Auto-starting ClipReaderService.")
+                wasAutoStarted = true
+                val intent = android.content.Intent(this, com.clipreader.service.ClipReaderService::class.java)
+                startForegroundService(intent)
+            }
+        } else {
+            // Auto-stop if we are no longer in an AI app AND it was auto-started
+            // Also don't stop if it's our own app or the target TTS apps
+            val isOurAppOrTarget = pkg == "com.clipreader" || pkg == "com.doubao.app" || pkg == "com.larus.nova"
+            
+            if (wasAutoStarted && !isOurAppOrTarget) {
+                Log.d("AutoCopierService", "Left AI app: $pkg. Auto-stopping ClipReaderService.")
+                wasAutoStarted = false
+                val intent = android.content.Intent(this, com.clipreader.service.ClipReaderService::class.java)
+                stopService(intent)
+            }
         }
     }
 
@@ -77,6 +94,7 @@ class AutoCopierService : AccessibilityService() {
     // ---------- Voice Input Toggle ----------
 
     private var isListening = false
+    private var voiceAttemptId = 0L
 
     /**
      * Toggle voice input:
@@ -84,16 +102,24 @@ class AutoCopierService : AccessibilityService() {
      * - Second tap: tap "结束说话" (end speech) button
      */
     fun tryVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
+        voiceAttemptId += 1
+        val attemptId = voiceAttemptId
         if (isListening) {
             // End recording
             stopVoiceInput(overlayManager)
         } else {
             // Start recording
-            startVoiceInput(overlayManager)
+            startVoiceInput(overlayManager, attemptId)
         }
     }
 
-    private fun startVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?) {
+    private fun startVoiceInput(overlayManager: com.clipreader.overlay.OverlayManager?, attemptId: Long) {
+        if (isKeyboardVisible()) {
+            Log.d("AutoCopierService", "startVoiceInput: keyboard already visible, tapping speak button directly")
+            tapSpeakButton(overlayManager, attemptId)
+            return
+        }
+
         val rootNode = rootInActiveWindow
         if (rootNode == null) {
             Log.w("AutoCopierService", "startVoiceInput: no root window")
@@ -127,10 +153,7 @@ class AutoCopierService : AccessibilityService() {
 
         dispatchGesture(tapInputGesture, object : GestureResultCallback() {
             override fun onCompleted(g: GestureDescription?) {
-                // Step 2: After keyboard appears, tap the 点击说话 button
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    tapSpeakButton(overlayManager)
-                }, 600)
+                waitForKeyboardThenTapSpeak(overlayManager, attemptId = attemptId)
             }
             override fun onCancelled(g: GestureDescription?) {
                 Log.w("AutoCopierService", "Input field tap cancelled")
@@ -138,7 +161,12 @@ class AutoCopierService : AccessibilityService() {
         }, null)
     }
 
-    private fun tapSpeakButton(overlayManager: com.clipreader.overlay.OverlayManager?) {
+    private fun tapSpeakButton(overlayManager: com.clipreader.overlay.OverlayManager?, attemptId: Long) {
+        if (attemptId != voiceAttemptId) {
+            Log.d("AutoCopierService", "tapSpeakButton: stale attempt, skipping")
+            return
+        }
+
         // Doubao IME "点击说话" button is at a fixed position in the keyboard toolbar.
         // On 1080x2424 screen: approximately x=270, y=1680 (25% left, 69% down).
         val dm = resources.displayMetrics
@@ -152,6 +180,10 @@ class AutoCopierService : AccessibilityService() {
             .build()
         dispatchGesture(gesture, object : GestureResultCallback() {
             override fun onCompleted(g: GestureDescription?) {
+                if (attemptId != voiceAttemptId) {
+                    Log.d("AutoCopierService", "tapSpeakButton callback: stale attempt, ignoring")
+                    return
+                }
                 isListening = true
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                     overlayManager?.setMicState(com.clipreader.overlay.OverlayManager.MicState.LISTENING)
@@ -466,5 +498,37 @@ class AutoCopierService : AccessibilityService() {
             }
         }
         return result
+    }
+
+    private fun isKeyboardVisible(): Boolean {
+        val interactiveWindows = windows ?: return false
+        return interactiveWindows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD }
+    }
+
+    private fun waitForKeyboardThenTapSpeak(
+        overlayManager: com.clipreader.overlay.OverlayManager?,
+        attemptId: Long,
+        attempt: Int = 0
+    ) {
+        if (attemptId != voiceAttemptId) {
+            Log.d("AutoCopierService", "waitForKeyboardThenTapSpeak: stale attempt, stopping")
+            return
+        }
+
+        if (isKeyboardVisible()) {
+            Log.d("AutoCopierService", "Keyboard detected, tapping speak button")
+            tapSpeakButton(overlayManager, attemptId)
+            return
+        }
+
+        if (attempt >= 10) {
+            Log.w("AutoCopierService", "Keyboard did not appear after tapping input; aborting speak tap")
+            overlayManager?.setMicState(com.clipreader.overlay.OverlayManager.MicState.IDLE)
+            return
+        }
+
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            waitForKeyboardThenTapSpeak(overlayManager, attemptId, attempt + 1)
+        }, 120)
     }
 }

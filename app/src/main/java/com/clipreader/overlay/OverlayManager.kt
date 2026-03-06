@@ -4,11 +4,11 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Build
+import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.os.Handler
 import android.os.Looper
@@ -42,6 +42,7 @@ class OverlayManager(
     private var cardShare: View? = null
     private var cardMic: View? = null
     private var cardBack: View? = null
+    private var cardExit: View? = null
 
     private var params: WindowManager.LayoutParams? = null
 
@@ -90,6 +91,7 @@ class OverlayManager(
         cardShare = floatingView?.findViewById(R.id.cardShare)
         cardMic = floatingView?.findViewById(R.id.cardMic)
         cardBack = floatingView?.findViewById(R.id.cardBack)
+        cardExit = floatingView?.findViewById(R.id.cardExit)
 
         params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -100,11 +102,10 @@ class OverlayManager(
         ).apply {
             gravity = Gravity.TOP or Gravity.END
             x = 24
-            y = 300 // Starting from top down to avoid the keyboard area.
+            y = 300 + cmToPx(2.0f)
         }
 
-        setupDragListener()
-        setupMicButton()
+        setupControlTouchHandlers()
 
         windowManager?.addView(floatingView, params)
         setState(State.IDLE)
@@ -128,11 +129,13 @@ class OverlayManager(
             cardShare?.visibility = View.VISIBLE
             cardMic?.visibility = View.VISIBLE
             cardBack?.visibility = View.GONE
+            cardExit?.visibility = View.VISIBLE
         } else {
             cardPlay?.visibility = View.GONE
             cardShare?.visibility = View.GONE
             cardMic?.visibility = View.GONE
             cardBack?.visibility = View.VISIBLE
+            cardExit?.visibility = View.VISIBLE
         }
         resetHideTimer()
     }
@@ -213,80 +216,81 @@ class OverlayManager(
         }
     }
 
-    private fun setupMicButton() {
-        micBackground?.setOnClickListener {
-            onVoiceInput()
-        }
-        shareBackground?.setOnClickListener {
-            onShare()
-        }
-        backBackground?.setOnClickListener {
-            onBack()
+    private fun setupControlTouchHandlers() {
+        val targetActions = listOf(
+            Pair(cardPlay, { onPlayPause() }),
+            Pair(cardShare, { onShare() }),
+            Pair(cardMic, { onVoiceInput() }),
+            Pair(cardBack, { onBack() }),
+            Pair(cardExit, { onStopService() })
+        )
+
+        for ((targetView, clickAction) in targetActions) {
+            targetView?.setOnTouchListener(createDragAndClickListener(clickAction))
         }
     }
 
-    private fun setupDragListener() {
+    private fun createDragAndClickListener(clickAction: () -> Unit): View.OnTouchListener {
         var initialX = 0
         var initialY = 0
         var initialTouchX = 0f
         var initialTouchY = 0f
         var isClick = false
 
-        floatingView?.setOnTouchListener { _, event ->
+        return View.OnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     hideHandler.removeCallbacks(hideRunnable)
                     floatingView?.alpha = 1.0f
-                    
-                    initialX = params!!.x
-                    initialY = params!!.y
+
+                    val safeParams = params ?: return@OnTouchListener false
+                    initialX = safeParams.x
+                    initialY = safeParams.y
                     initialTouchX = event.rawX
                     initialTouchY = event.rawY
                     isClick = true
                     true
                 }
+
                 MotionEvent.ACTION_MOVE -> {
                     val dx = (event.rawX - initialTouchX).toInt()
                     val dy = (event.rawY - initialTouchY).toInt()
-
                     if (abs(dx) > 10 || abs(dy) > 10) {
                         isClick = false
                     }
 
-                    params!!.x = initialX + dx
-                    params!!.y = initialY + dy
-                    windowManager?.updateViewLayout(floatingView, params)
+                    val safeParams = params ?: return@OnTouchListener false
+                    safeParams.x = initialX + dx
+                    safeParams.y = initialY + dy
+                    windowManager?.updateViewLayout(floatingView, safeParams)
                     true
                 }
+
                 MotionEvent.ACTION_UP -> {
-                    val screenHeight = context.resources.displayMetrics.heightPixels
-                    if (params!!.y < screenHeight - 300 && !isClick) {
-                        // Dragged far down but not a click — nothing
-                    } else if (params!!.y >= screenHeight - 300 && !isClick) {
-                        onStopService()
-                    } else if (isClick) {
-                        if (currentNavigationMode == NavigationMode.BACK_ONLY) {
-                            onBack()
-                        } else {
-                            // Split by Y: 3 segments: play, share, mic
-                            val viewHeight = floatingView?.height ?: 3
-                            val touchY = event.y
-                            when {
-                                touchY < viewHeight * 0.33f -> onPlayPause()
-                                touchY < viewHeight * 0.66f -> onShare()
-                                else -> onVoiceInput()
-                            }
+                    if (!isClick) {
+                        val safeParams = params ?: return@OnTouchListener false
+                        val screenHeight = context.resources.displayMetrics.heightPixels
+                        if (safeParams.y >= screenHeight - 300) {
+                            onStopService()
                         }
+                    } else {
+                        clickAction()
                     }
-                    
+
                     if (currentState == State.IDLE && micState == MicState.IDLE) {
                         resetHideTimer()
                     }
                     true
                 }
+
                 else -> false
             }
         }
+    }
+
+    private fun cmToPx(cm: Float): Int {
+        val metrics = context.resources.displayMetrics
+        return ((cm / 2.54f) * metrics.ydpi).toInt()
     }
 
     fun remove() {
@@ -294,7 +298,9 @@ class OverlayManager(
         floatingView?.let {
             try {
                 windowManager?.removeView(it)
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+                Log.w("OverlayManager", "Failed to remove floating view cleanly", e)
+            }
             floatingView = null
         }
     }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import androidx.annotation.NonNull;
@@ -33,6 +34,12 @@ public final class ActivityMainBinding implements ViewBinding {
   public final Button btnTestPrimary;
 
   @NonNull
+  public final EditText editAzureKey;
+
+  @NonNull
+  public final EditText editAzureRegion;
+
+  @NonNull
   public final Spinner spinnerFallbackEngine;
 
   @NonNull
@@ -40,13 +47,16 @@ public final class ActivityMainBinding implements ViewBinding {
 
   private ActivityMainBinding(@NonNull LinearLayout rootView, @NonNull Button btnStartService,
       @NonNull Button btnStopService, @NonNull Button btnTestFallback,
-      @NonNull Button btnTestPrimary, @NonNull Spinner spinnerFallbackEngine,
+      @NonNull Button btnTestPrimary, @NonNull EditText editAzureKey,
+      @NonNull EditText editAzureRegion, @NonNull Spinner spinnerFallbackEngine,
       @NonNull Spinner spinnerPrimaryEngine) {
     this.rootView = rootView;
     this.btnStartService = btnStartService;
     this.btnStopService = btnStopService;
     this.btnTestFallback = btnTestFallback;
     this.btnTestPrimary = btnTestPrimary;
+    this.editAzureKey = editAzureKey;
+    this.editAzureRegion = editAzureRegion;
     this.spinnerFallbackEngine = spinnerFallbackEngine;
     this.spinnerPrimaryEngine = spinnerPrimaryEngine;
   }
@@ -102,6 +112,18 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.editAzureKey;
+      EditText editAzureKey = ViewBindings.findChildViewById(rootView, id);
+      if (editAzureKey == null) {
+        break missingId;
+      }
+
+      id = R.id.editAzureRegion;
+      EditText editAzureRegion = ViewBindings.findChildViewById(rootView, id);
+      if (editAzureRegion == null) {
+        break missingId;
+      }
+
       id = R.id.spinnerFallbackEngine;
       Spinner spinnerFallbackEngine = ViewBindings.findChildViewById(rootView, id);
       if (spinnerFallbackEngine == null) {
@@ -115,7 +137,8 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       return new ActivityMainBinding((LinearLayout) rootView, btnStartService, btnStopService,
-          btnTestFallback, btnTestPrimary, spinnerFallbackEngine, spinnerPrimaryEngine);
+          btnTestFallback, btnTestPrimary, editAzureKey, editAzureRegion, spinnerFallbackEngine,
+          spinnerPrimaryEngine);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

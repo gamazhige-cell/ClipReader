@@ -115,4 +115,30 @@
         </FrameLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- Exit Button (Muted Gray or Red tint) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardExit"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="4dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="@android:color/transparent">
+
+        <FrameLayout
+            android:id="@+id/exitBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_floating_minimal">
+
+            <ImageView
+                android:id="@+id/exitImage"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="#8E8E93" />
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+
 </LinearLayout>
