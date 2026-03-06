@@ -1,191 +1,169 @@
-**ClipReader: AI-Powered TTS & UI Automation Assistant**
+# ClipReader
 
-An AI-powered Android system that connects TTS/ASR models, UI automation workflows, and active context to solve the operational problem of manual AI chatbot interactions.
+AI-powered Android system that connects TTS/ASR models, UI automation workflows, and clipboard APIs to solve a real operational problem in mobile AI interaction.
 
 This project demonstrates how AI and continuous background automation can be integrated into practical mobile systems rather than used as isolated features.
 
----
-
-# **Problem**
+## Problem
 
 Many real-world mobile workflows, especially interacting with AI assistants (like Claude, ChatGPT), still rely on manual reading or repetitive UI tapping.
 
 Example scenario:
-• Users need to consume AI responses or screen text hands-free
-• Manual copying, reading, or voice-input typing requires too many taps and disrupts flow
-• No seamless, automated speech-to-action pipeline exists natively
+- Users need to consume AI responses or screen text hands-free
+- Manual copying, reading, or voice-input typing requires too many taps and disrupts flow
+- No seamless, automated speech-to-action pipeline exists natively
 
-The goal of this project is to demonstrate how **AI and UI Automation can automate this workflow end-to-end.**
+The goal of this project is to demonstrate how AI and UI Automation can automate this workflow end-to-end.
 
----
-
-# **Solution Overview**
+## Solution Overview
 
 This system connects AI models (TTS/ASR) with Accessibility automation logic and execution actions.
 
 High-level workflow:
-
+```
 Input Source (Clipboard / Voice / Active App Context)
-↓
+       ↓
 AI Processing (Azure TTS / Doubao ASR)
-↓
+       ↓
 Decision Logic (App State Analysis & Element Detection)
-↓
+       ↓
 Automation Trigger (Accessibility Service Pipeline)
-↓
+       ↓
 System Action (Audio Playback / Automated UI Taps)
+```
 
 The architecture demonstrates how AI interaction components can be embedded into a larger operational system to drive mobile automation.
 
----
-
-# **Architecture**
-
-Example pipeline:
+## Architecture
 
 **Input Layer**
-• Android Clipboard Monitor
-• Overlay Window Controls
-• Package state tracking
+- Clipboard text capture
+- Voice input (ASR)
+- Active screen context detection
 
 **AI Processing Layer**
-• Azure TTS APIs
-• Doubao Speech-to-Text integration
+- Azure TTS (text-to-speech synthesis)
+- Doubao ASR (speech-to-text recognition)
+- App state analysis and element detection
 
 **Automation Layer**
-• Accessibility event detection (Window state changes)
-• UI node traversal and bounds calculation
+- Accessibility Service pipeline
+- Background continuous monitoring
+- Dynamic UI interaction trigger system
 
 **Execution Layer**
-• Background Audio service
-• Automated UI gestures (Auto-tap Input / Auto-tap Send)
-• Contextual app switching
+- Audio playback of AI responses
+- Automated UI taps and form-filling
+- Cross-app workflow orchestration
 
-Architecture Diagram:
-```text
-Input (Text/Voice)
- ↓
-AI Model (TTS/ASR Synthesis)
- ↓
-Decision Logic (Determine Target Buttons & State)
- ↓
-Automation Trigger (Gesture Builder)
- ↓
-Action / Notification (Screen Taps / Audio Playback)
+**Architecture Diagram:**
+```
+Clipboard / Voice Input
+       ↓
+  Azure TTS / ASR
+       ↓
+  State Detection
+       ↓
+ Accessibility Trigger
+       ↓
+ UI Action / Audio Output
 ```
 
----
-
-# **Tech Stack**
+## Tech Stack
 
 **AI / ML**
-• Microsoft Azure TTS APIs
-• Doubao ASR models
-• System Offline TTS
+- Azure Cognitive Services TTS
+- Doubao ASR API
+- UI element detection
 
-**App / Backend**
-• Kotlin / Android SDK
-• Foreground Services
-• OkHttp (API Integration)
+**Mobile**
+- Android (Kotlin)
+- Accessibility Service API
+- Background service architecture
 
 **Automation**
-• Android AccessibilityService API
-• Floating Window Overlay (SYSTEM_ALERT_WINDOW)
-• GestureDescription & UI Node Traversal
+- Clipboard monitoring pipeline
+- Continuous background execution
+- Cross-app UI automation
 
 **Infrastructure**
-• Local Encrypted Storage (KeyStore / EncryptedSharedPreferences)
-• Gradle CI/Build Scripts
+- Android Gradle build system
+- Modular app architecture
 
----
-
-# **Example Use Cases**
+## Example Use Cases
 
 This architecture can support:
-• **AI Chatbot Automation**: Hands-free interactions with Claude/ChatGPT
-• **Accessibility Enhancements**: Screen reading for visually impaired
-• **Operational Alerts**: Automatic text-to-speech for critical clipboard copies
-• **Content Automation**: Seamless voice-to-text pipeline with auto-submission
+- Hands-free AI chatbot consumption on mobile
+- Automated form-filling workflows
+- Screen reader enhancement for accessibility
+- Voice-controlled mobile operations
+- Background clipboard processing pipelines
 
----
-
-# **Results**
+## Results
 
 Example performance metrics:
-• Event detection to audio playback latency: **<1 second**
-• Automated workflow entirely replacing manual voice-input sending steps
-• Reduced mobile operational workload significantly for power users
+- Clipboard capture to audio playback: < 2 seconds
+- Continuous background automation without user intervention
+- Replaces repetitive manual reading and tapping workflows
+- Demonstrated working cross-app UI automation pipeline
 
-This project demonstrates how AI can drive **practical operational efficiency** on mobile devices.
+This project demonstrates how AI can drive practical operational efficiency on mobile devices.
 
----
-
-# **Demo**
+## Demo
 
 Example workflow:
-1. System receives input signal (User opens AI app / UI detects ChatGPT/Claude)
-2. AI model processes the input (Text copied to clipboard / Voice recorded)
-3. Decision logic determines required action (Finds "Send" button on screen)
-4. Automation pipeline triggers response (Executes gesture tap on target coordinates)
+1. User copies AI response text to clipboard
+2. ClipReader detects new clipboard content in background
+3. Azure TTS synthesizes natural speech from the text
+4. System plays audio response hands-free
+5. ASR captures voice reply and routes to target app
 
-*(Add screenshots, GIFs, or demo videos here)*
+*Add screenshots, GIFs, or demo videos here.*
 
----
+## Repository Structure
 
-# **Repository Structure**
-
-```text
-ClipReader
-│
-├── app/src/main/java/com/clipreader
-│   ├── clipboard    # Automation triggers & UI traversal
-│   ├── overlay      # Floating window system
-│   ├── service      # Background orchestration
-│   ├── tts          # AI TTS model integrations
-│   └── util         # Encrypted key management
-│
+```
+ClipReader/
+├── app/
+│   ├── src/
+│       ├── main/
+│           ├── java/       # Kotlin source
+│           └── res/        # UI resources
+├── gradle/
 ├── build.gradle
 └── README.md
 ```
 
----
-
-# **Quick Start**
+## Quick Start
 
 Clone the repository
 ```bash
-git clone https://github.com/chenweilie/ClipReader.git
+git clone https://github.com/chenweilie/ClipReader
 ```
 
-Compile and Build (Android Studio or Gradle Wrapper)
+Open in Android Studio and build
 ```bash
 ./gradlew assembleDebug
 ```
 
-Install to connected device
+Install on device
 ```bash
-./gradlew installDebug
+adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
----
-
-# **Future Improvements**
+## Future Improvements
 
 Possible extensions:
-• multi-input support (Direct screen OCR reading)
-• improved model accuracy (Multi-language auto-detection)
-• additional automation triggers (Support for more LLM applications)
-• dashboard monitoring (History and token usage logs)
+- Multi-language TTS support
+- Improved ASR accuracy with custom models
+- Visual automation triggers (screen OCR)
+- Plugin system for additional AI model backends
+- iOS companion app
 
----
+## Author
 
-# **Author**
-
-William Chen
+William Chen  
 Applied AI Engineer | AI Integration | Automation Systems
 
-LinkedIn
-https://linkedin.com/in/william-chen-98264938
-
-GitHub
-https://github.com/chenweilie
+**LinkedIn:** https://linkedin.com/in/william-chen-98264938  
+**GitHub:** https://github.com/chenweilie
